@@ -3,6 +3,8 @@
 #### The Team members
 
 * Names, epita email addresses, and GitHub usernames of all team members.
+* **Team:** Thuong Gia Han PHAM, Victor Oganwo, Stanislaw
+  
 
 ---
 
