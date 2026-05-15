@@ -2,7 +2,7 @@
 
 Capstone Project — Generative AI for Software Engineering — EPITA 2026
 
-**Team:** Thuong Gia Han PHAM, Victor Oganwo, Stanislaw
+
 
 ---
 
