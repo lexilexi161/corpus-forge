@@ -30,3 +30,14 @@
 - **Changes Made**: Added a selectable prompt-history agent definition.
 - **Context and Reasons for Changes**: The repo already logs prompt history via a hook; adding an agent makes prompt-history logging available in the same agent list as journal logging.
 >>>>>>> 4f1c596c90398ebdc03b583c0bc4005541daaa7d
+
+### **New Interaction**
+- **Agent Version**: 2.3
+- **Date**: 15-05-2026 13:29
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: activate journal-logger.agent.md
+- **CoPilot Mode**: Agent
+- **CoPilot Model**: Claude Haiku 4.5
+- **Socratic Mode**: OFF
+- **Changes Made**: Activated journal-logger.agent.md agent; appended this journal entry.
+- **Context and Reasons for Changes**: User requested activation of journal-logger agent. The agent is now logging interactions to JOURNAL.md per its configuration.
