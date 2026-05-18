@@ -14,3 +14,6 @@
 ### 18-05-2026 15:13
 - **Prompt**: can you go into databse markdonwn in misc documents and edit it based upon my changes to the database file
 
+### 18-05-2026 15:50
+- **Prompt**: based on the updates to shcema update database architecture just note it was moved to documentation from misc documentation
+

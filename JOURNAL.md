@@ -113,3 +113,8 @@
 - **Socratic Mode**: OFF
 - **Changes Made**: Created `misc docs/database_architecture.md` documenting the current SQL schema in `backend/database/schema.sql` (tables: `documents`, `chunks`, `corpus`, `corpus_documents`, `artifacts`).
 - **Context and Reasons for Changes**: User requested that documentation in `misc docs` be updated to reflect changes made to the database schema.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 18-05-2026 15:50
+- **Prompt**: based on the updates to shcema update database architecture just note it was moved to documentation from misc documentation
