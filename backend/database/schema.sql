@@ -40,7 +40,20 @@ document_id int,
 FOREIGN KEY(corpus_id) REFERENCES corpus(corpus_id),
 FOREIGN KEY(document_id) REFERENCES documents(document_id)
 );
-
+CREATE TABLE user(
+user_id int PRIMARY KEY AUTO_INCREMENT,
+username varchar(255) NOT NULL,
+user_password VARCHAR(255) NOT NULL,
+date_created datetime NOT NULL
+);
+CREATE TABLE session(
+session_id INT PRIMARY KEY AUTO_INCREMENT,
+user_id INT,
+session_token VARCHAR(255) NOT NULL,
+started_at datetime NOT NULL,
+ended_at datetime ,
+FOREIGN KEY(user_id) REFERENCES user(user_id)
+);
 
 
 
