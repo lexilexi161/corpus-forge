@@ -43,18 +43,26 @@ FOREIGN KEY(document_id) REFERENCES documents(document_id)
 CREATE TABLE user(
 user_id int PRIMARY KEY AUTO_INCREMENT,
 username varchar(255) NOT NULL,
-user_password VARCHAR(255) NOT NULL,
+user_password varchar(255) NOT NULL,
 date_created datetime NOT NULL
 );
 CREATE TABLE session(
 session_id INT PRIMARY KEY AUTO_INCREMENT,
 user_id INT,
-session_token VARCHAR(255) NOT NULL,
+session_token varchar(255) NOT NULL,
 started_at datetime NOT NULL,
 ended_at datetime ,
 FOREIGN KEY(user_id) REFERENCES user(user_id)
 );
-
+CREATE TABLE cost(
+request_id int PRIMARY KEY AUTO_INCREMENT,
+user_id int, 
+request_type varchar(255) NOT NULL,
+input_tokens int(255),
+output_tokens int(255),
+created_at datetime NOT NULL,
+FOREIGN KEY(user_id) REFERENCEs user(user_id)
+);
 
 
 

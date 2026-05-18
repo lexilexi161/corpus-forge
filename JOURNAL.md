@@ -107,7 +107,7 @@
 
 - **Agent Version**: Kiro
 - **Date**: 18-05-2026 15:13
-- **User**: thuong-gia-han.pham@epita.fr
+- **User**: stanislaw.wojcieciechowski@epita.fr
 - **Prompt**: can you go into databse markdonwn in misc documents and edit it based upon my changes to the database file
 - **CoPilot Mode**: Edit
 - **Socratic Mode**: OFF
@@ -123,3 +123,14 @@
 - **Hook Version**: 1.02
 - **Date**: 18-05-2026 15:50
 - **Prompt**: based on the updates to shcema update database architecture file  just note it was moved to documentation from misc documentation
+
+### **New Interaction**
+
+- **Agent Version**: Kiro
+- **Date**: 18-05-2026 15:50
+- **User**: stanislaw.wojciechowski@epita.fr
+- **Prompt**: based on the updates to shcema update database architecture file  just note it was moved to documentation from misc documentation
+- **CoPilot Mode**: Edit
+- **Socratic Mode**: OFF
+- **Changes Made**: Updated `documentation/database_architecture.md` to reflect `backend/database/schema.sql` additions (`user`, `session`, `cost`) and added a note stating the file was moved from `misc docs/database_architecture.md` to `documentation/database_architecture.md` on 2026-05-18.
+- **Context and Reasons for Changes**: User requested the documentation be updated to reflect recent schema changes and to note the file relocation.
