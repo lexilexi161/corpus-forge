@@ -102,3 +102,14 @@
 - **Hook Version**: 1.02
 - **Date**: 18-05-2026 15:13
 - **Prompt**: can you go into databse markdonwn in misc documents and edit it based upon my changes to the database file
+
+### **New Interaction**
+
+- **Agent Version**: Kiro
+- **Date**: 18-05-2026 15:13
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: can you go into databse markdonwn in misc documents and edit it based upon my changes to the database file
+- **CoPilot Mode**: Edit
+- **Socratic Mode**: OFF
+- **Changes Made**: Created `misc docs/database_architecture.md` documenting the current SQL schema in `backend/database/schema.sql` (tables: `documents`, `chunks`, `corpus`, `corpus_documents`, `artifacts`).
+- **Context and Reasons for Changes**: User requested that documentation in `misc docs` be updated to reflect changes made to the database schema.
