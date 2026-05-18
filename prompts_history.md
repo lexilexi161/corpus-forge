@@ -11,3 +11,6 @@
 ### 18-05-2026 14:45
 - **Prompt**: why i can not run npm run dev
 
+### 18-05-2026 15:13
+- **Prompt**: can you go into databse markdonwn in misc documents and edit it based upon my changes to the database file
+
