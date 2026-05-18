@@ -27,6 +27,20 @@ PRIMARY KEY(document_id, corpus_id),
 FOREIGN KEY(document_id) REFERENCES documents(document_id),
 FOREIGN KEY(corpus_id) REFERENCES corpus(corpus_id)
 );
+CREATE TABLE artifacts(
+artifact_id int PRIMARY KEY AUTO_INCREMENT,
+artifact_name varchar(255) NOT NULL,
+artifact_date datetime NOT NULL,
+artifact_size int NOT NULL,
+artifact_type varchar(255) NOT NULL,
+artifact_path varchar(255) NOT NULL,
+artifact_prompt text,
+corpus_id int,
+document_id int, 
+FOREIGN KEY(corpus_id) REFERENCES corpus(corpus_id),
+FOREIGN KEY(document_id) REFERENCES documents(document_id)
+);
+
 
 
 
