@@ -41,3 +41,27 @@
 - **Socratic Mode**: OFF
 - **Changes Made**: Activated journal-logger.agent.md agent; appended this journal entry.
 - **Context and Reasons for Changes**: User requested activation of journal-logger agent. The agent is now logging interactions to JOURNAL.md per its configuration.
+
+### **New Interaction**
+- **Agent Version**: Kiro
+- **Date**: 17-05-2026 22:45
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: fix the red lines in App.tsx
+- **CoPilot Mode**: Agent
+- **CoPilot Model**: Auto
+- **Socratic Mode**: OFF
+- **Changes Made**: Fixed TYPE_BADGE from Tailwind classes to inline styles; added message state so chat appends messages on send; synced activeNav ↔ activeTab bidirectionally.
+- **Context and Reasons for Changes**: TYPE_BADGE used Tailwind class names but Tailwind was not installed, so badges rendered without color. Chat input cleared on Enter but did not append messages to UI, confusing users. Nav and tab states were independent causing visual desync.
+
+---
+
+### **New Interaction**
+- **Agent Version**: Kiro
+- **Date**: 17-05-2026 22:45
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: npm run dev — Missing script: "dev" error
+- **CoPilot Mode**: Chat
+- **CoPilot Model**: Auto
+- **Socratic Mode**: OFF
+- **Changes Made**: No code changes. Diagnosed that npm was run from the wrong directory.
+- **Context and Reasons for Changes**: The error occurred because `npm run dev` was executed outside the `corpus-forge/frontend/` folder. Running `cd corpus-forge/frontend && npm install && npm run dev` resolved the issue.
