@@ -8,3 +8,6 @@
 ### 18-05-2026 14:39
 - **Prompt**: git pull --rebase error: cannot pull with rebase: You have unstaged changes. error: Please commit or stash them. git pull --no-rebase error: Your local changes to the following files would be overwritten by merge:         JOURNAL.md Please commit your changes or stash them before you merge. Aborting Merge with strategy ort failed. git config pull.rebase true git config pull.rebase false git config pull.ff only  it isnt work
 
+### 18-05-2026 14:45
+- **Prompt**: why i can not run npm run dev
+
