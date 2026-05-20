@@ -1,4 +1,4 @@
-from flask import Bluepring, jsonify, 
+from flask import Blueprint, jsonify
 cost_bp = Blueprint('cost',__name__)
 @cost_bp.route('/cost',methods = ['GET'])
 def get_cost():
