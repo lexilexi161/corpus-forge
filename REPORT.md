@@ -34,8 +34,8 @@ For each major decision:
 
 * Document how the project was originally divided among each team member.
 CHLOE - fronted and user flow, 
-- upload page
-- document browser
+-upload page
+-document browser
 -document selection and removal
 -chat page
 -flashcard
