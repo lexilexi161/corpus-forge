@@ -20,3 +20,6 @@
 ### 21-05-2026 09:29
 - **Prompt**: i havent commit yet
 
+### 21-05-2026 09:37
+- **Prompt**: the node_modules is the thing i dont need to push it, right?
+
