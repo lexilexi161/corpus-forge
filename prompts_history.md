@@ -20,3 +20,6 @@
 ### 18-05-2026 15:50
 - **Prompt**: based on the updates to shcema update database architecture file  just note it was moved to documentation from misc documentation
 
+### 21-05-2026 15:16
+- **Prompt**: I am working on the AI/RAG part of our Corpus Forge Flask capstone project.  My task is to build the first RAG foundation: document parsing, text chunking, and simple retrieval.  Please inspect the current backend structure and explain how the new backend/rag module should fit into the project. Do not modify files yet. I want to understand how parser.py, chunker.py, and retriever.py will later connect to document upload and chat routes.
+

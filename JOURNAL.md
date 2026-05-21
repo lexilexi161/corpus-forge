@@ -134,3 +134,8 @@
 - **Socratic Mode**: OFF
 - **Changes Made**: Updated `documentation/database_architecture.md` to reflect `backend/database/schema.sql` additions (`user`, `session`, `cost`) and added a note stating the file was moved from `misc docs/database_architecture.md` to `documentation/database_architecture.md` on 2026-05-18.
 - **Context and Reasons for Changes**: User requested the documentation be updated to reflect recent schema changes and to note the file relocation.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 21-05-2026 15:16
+- **Prompt**: I am working on the AI/RAG part of our Corpus Forge Flask capstone project.  My task is to build the first RAG foundation: document parsing, text chunking, and simple retrieval.  Please inspect the current backend structure and explain how the new backend/rag module should fit into the project. Do not modify files yet. I want to understand how parser.py, chunker.py, and retriever.py will later connect to document upload and chat routes.
