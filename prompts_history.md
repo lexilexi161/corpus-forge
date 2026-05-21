@@ -20,6 +20,7 @@
 ### 18-05-2026 15:50
 - **Prompt**: based on the updates to shcema update database architecture file  just note it was moved to documentation from misc documentation
 
+<<<<<<< HEAD
 ### 21-05-2026 15:16
 - **Prompt**: I am working on the AI/RAG part of our Corpus Forge Flask capstone project.  My task is to build the first RAG foundation: document parsing, text chunking, and simple retrieval.  Please inspect the current backend structure and explain how the new backend/rag module should fit into the project. Do not modify files yet. I want to understand how parser.py, chunker.py, and retriever.py will later connect to document upload and chat routes.
 
@@ -37,4 +38,20 @@
 
 ### 21-05-2026 15:30
 - **Prompt**: Help me create a small manual test for the backend/rag module.  I want to test: 1. parsing a text file 2. chunking the extracted text 3. retrieving relevant chunks from a sample query  Do not connect it to Flask yet. I just want to verify that the RAG utility functions work independently first.
+=======
+### 21-05-2026 15:19
+- **Prompt**: how can i push without node modules part?
+
+### 21-05-2026 15:21
+- **Prompt**: i want to push in main but i dont wanna push node-module on it
+
+### 21-05-2026 15:30
+- **Prompt**: give me the command- do not do that
+
+### 21-05-2026 15:33
+- **Prompt**: Already up to date. git add . echo "frontend/node_modules/" >> .gitignore  git add .gitignore  git commit -m 'Redesign UI"   quote> git push origin main quote>  i dont think it work
+>>>>>>> 887a43954309304d02f5b4dd1e30c74634d59ae5
+
+### 21-05-2026 15:59
+- **Prompt**: help me push and commit what i did and push keeps giving me error Solve any error and tell me uve pushed succesfully
 
