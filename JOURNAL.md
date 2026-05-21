@@ -253,3 +253,21 @@ The retriever should compare a user question with document chunks and return the
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 15:30
 - **Prompt**: Help me create a small manual test for the backend/rag module.  I want to test: 1. parsing a text file 2. chunking the extracted text 3. retrieving relevant chunks from a sample query  Do not connect it to Flask yet. I just want to verify that the RAG utility functions work independently first.
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 21-05-2026 15:30
+- **User**: victor.oganwo@epita.fr
+- **Prompt**: Help me create a small manual test for the backend/rag module.
+
+I want to test:
+1. parsing a text file
+2. chunking the extracted text
+3. retrieving relevant chunks from a sample query
+
+Do not connect it to Flask yet. I just want to verify that the RAG utility functions work independently first.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes yet. Preparing a standalone manual test script for the RAG utilities.
+- **Context and Reasons for Changes**: The user wants an isolated check of parser, chunker, and retriever before any Flask integration.
