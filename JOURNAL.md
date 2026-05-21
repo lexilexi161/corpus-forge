@@ -97,43 +97,6 @@
 - **Hook Version**: 1.02
 - **Date**: 18-05-2026 14:45
 - **Prompt**: why i can not run npm run dev
-
-### **New Interaction**
-- **Hook Version**: 1.02
-- **Date**: 18-05-2026 15:13
-- **Prompt**: can you go into databse markdonwn in misc documents and edit it based upon my changes to the database file
-
-### **New Interaction**
-
-- **Agent Version**: Kiro
-- **Date**: 18-05-2026 15:13
-- **User**: stanislaw.wojcieciechowski@epita.fr
-- **Prompt**: can you go into databse markdonwn in misc documents and edit it based upon my changes to the database file
-- **CoPilot Mode**: Edit
-- **Socratic Mode**: OFF
-- **Changes Made**: Created `misc docs/database_architecture.md` documenting the current SQL schema in `backend/database/schema.sql` (tables: `documents`, `chunks`, `corpus`, `corpus_documents`, `artifacts`).
-- **Context and Reasons for Changes**: User requested that documentation in `misc docs` be updated to reflect changes made to the database schema.
-
-### **New Interaction**
-- **Hook Version**: 1.02
-- **Date**: 18-05-2026 15:50
-- **Prompt**: based on the updates to shcema update database architecture just note it was moved to documentation from misc documentation
-
-### **New Interaction**
-- **Hook Version**: 1.02
-- **Date**: 18-05-2026 15:50
-- **Prompt**: based on the updates to shcema update database architecture file  just note it was moved to documentation from misc documentation
-
-### **New Interaction**
-
-- **Agent Version**: Kiro
-- **Date**: 18-05-2026 15:50
-- **User**: stanislaw.wojciechowski@epita.fr
-- **Prompt**: based on the updates to shcema update database architecture file  just note it was moved to documentation from misc documentation
-- **CoPilot Mode**: Edit
-- **Socratic Mode**: OFF
-- **Changes Made**: Updated `documentation/database_architecture.md` to reflect `backend/database/schema.sql` additions (`user`, `session`, `cost`) and added a note stating the file was moved from `misc docs/database_architecture.md` to `documentation/database_architecture.md` on 2026-05-18.
-- **Context and Reasons for Changes**: User requested the documentation be updated to reflect recent schema changes and to note the file relocation.
 ### **New Interaction**
 
 - **Agent Version**: 2.3
@@ -150,8 +113,19 @@
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 09:27
 - **Prompt**: if i forgot to pull before code is that a problem?
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 21-05-2026 09:27
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: if i forgot to pull before code is that a problem?
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes; advised on risks of not pulling and recommended safe recovery steps.
+- **Context and Reasons for Changes**: Logged the question and suggested recovery workflow.
 
 ### **New Interaction**
 - **Hook Version**: 1.02
-- **Date**: 21-05-2026 10:01
-- **Prompt**: what should i do chore: log prompt [21-05-2026 09:27]  # Conflicts: #       JOURNAL.md #       prompts_history.md  # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # interactive rebase in progress; onto eda2750 # Last command done (1 command done): #    pick ff78180 # chore: log prompt [21-05-2026 09:27] # Next commands to do (4 remaining commands): #    pick fcb86ee # chore: log prompt [21-05-2026 09:28] #    pick aa1bdfc # chore: log prompt [21-05-2026 09:29] # You are currently rebasing branch 'feature/chloe/frontend' on 'eda 2750'. # # Changes to be committed: #       modified:   JOURNAL.md #       new file:   frontend/dist/assets/index-BA3exVfR.js #       new file:   frontend/dist/index.html #       modified:   prompts_history.md # ~                                                                    ~                                                                    W10: Warning: Changing a readonly file
+- **Date**: 21-05-2026 09:28
+- **Prompt**: i code on main branch
