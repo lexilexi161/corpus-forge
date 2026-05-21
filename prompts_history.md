@@ -65,3 +65,6 @@
 ### 22-05-2026 01:29
 - **Prompt**: Now help me connect the existing backend/rag parser and chunker to the document upload route.  Scope: - Only edit the Flask document upload route and any small helper needed. - When a user uploads a supported file, save the file as before. - Use backend/rag/parser.py to extract text from the uploaded file. - Use backend/rag/chunker.py to split the extracted text into chunks. - Return a JSON response that includes the document info and the number of chunks created. - Do not connect Gemini yet. - Do not modify the frontend. - Do not rewrite the whole backend. - Keep the code simple and easy to explain.  If the database already has a chunks table and helper functions, use them. If not, leave a clear TODO comment for saving chunks later, but still show chunk_count in the response.
 
+### 22-05-2026 01:35
+- **Prompt**: Help me test the updated document upload route manually.  Show me how to run the Flask backend and how to upload a sample txt/md/py file using curl or Postman.  I want to confirm that: 1. the file uploads successfully 2. the text is parsed 3. chunks are created 4. the JSON response includes chunk_count
+
