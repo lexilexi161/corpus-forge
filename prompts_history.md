@@ -23,3 +23,6 @@
 ### 21-05-2026 09:37
 - **Prompt**: the node_modules is the thing i dont need to push it, right?
 
+### 21-05-2026 09:43
+- **Prompt**: help me to push it in feature/chloe/frontend
+
