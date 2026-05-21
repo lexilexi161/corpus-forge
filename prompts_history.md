@@ -26,3 +26,6 @@
 ### 21-05-2026 15:21
 - **Prompt**: i want to push in main but i dont wanna push node-module on it
 
+### 21-05-2026 15:30
+- **Prompt**: give me the command- do not do that
+
