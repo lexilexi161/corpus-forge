@@ -137,7 +137,6 @@
 
 ### **New Interaction**
 - **Hook Version**: 1.02
-<<<<<<< HEAD
 - **Date**: 21-05-2026 15:16
 - **Prompt**: I am working on the AI/RAG part of our Corpus Forge Flask capstone project.  My task is to build the first RAG foundation: document parsing, text chunking, and simple retrieval.  Please inspect the current backend structure and explain how the new backend/rag module should fit into the project. Do not modify files yet. I want to understand how parser.py, chunker.py, and retriever.py will later connect to document upload and chat routes.
 ### **New Interaction**
@@ -171,7 +170,6 @@ Please inspect the current backend structure and explain how the new backend/rag
 - **Socratic Mode**: ON
 - **Changes Made**: No code changes. Provided a simpler explanation of how the backend RAG pieces fit together.
 - **Context and Reasons for Changes**: The user asked for a very simple explanation of the previously reviewed backend structure, so this entry records the clarification-only response.
-=======
 - **Date**: 21-05-2026 15:19
 - **Prompt**: how can i push without node modules part?
 ### **New Interaction**
@@ -185,12 +183,10 @@ Please inspect the current backend structure and explain how the new backend/rag
 - **Socratic Mode**: ON
 - **Changes Made**: No code changes; confirmed frontend/node_modules is tracked and explained how to remove it from the next push.
 - **Context and Reasons for Changes**: The repository currently tracks files inside frontend/node_modules, so they must be unstaged/removed from the index and ignored to keep them out of commits.
->>>>>>> 887a43954309304d02f5b4dd1e30c74634d59ae5
 
 ### **New Interaction**
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 15:21
-<<<<<<< HEAD
 - **Prompt**: Help me implement backend/rag/parser.py only.  It should extract text from .txt, .md, .py, .js, and .pdf files.  For text/source files, read with UTF-8 and handle encoding errors safely. For PDF, use pypdf if available, and give a clear error if it is not installed.  Please keep the code simple, readable, and beginner-friendly. Add error handling for unsupported file types, missing files, and empty files.
 ### **New Interaction**
 
@@ -265,7 +261,6 @@ The retriever should compare a user question with document chunks and return the
 - **Socratic Mode**: ON
 - **Changes Made**: No code changes yet. Preparing to implement simple keyword-overlap retrieval in retriever.py.
 - **Context and Reasons for Changes**: The task is limited to backend/rag/retriever.py, so the journal records the request before the code edit.
-=======
 - **Prompt**: i want to push in main but i dont wanna push node-module on it
 ### **New Interaction**
 
@@ -278,12 +273,10 @@ The retriever should compare a user question with document chunks and return the
 - **Socratic Mode**: ON
 - **Changes Made**: Added frontend/node_modules/ to .gitignore and removed tracked frontend/node_modules files from the index so future pushes exclude them.
 - **Context and Reasons for Changes**: The repository was tracking frontend/node_modules, so untracking it is required before pushing from main without those files.
->>>>>>> 887a43954309304d02f5b4dd1e30c74634d59ae5
 
 ### **New Interaction**
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 15:30
-<<<<<<< HEAD
 - **Prompt**: Help me create a small manual test for the backend/rag module.  I want to test: 1. parsing a text file 2. chunking the extracted text 3. retrieving relevant chunks from a sample query  Do not connect it to Flask yet. I just want to verify that the RAG utility functions work independently first.
 ### **New Interaction**
 
@@ -303,7 +296,6 @@ Do not connect it to Flask yet. I just want to verify that the RAG utility funct
 - **Socratic Mode**: ON
 - **Changes Made**: No code changes yet. Preparing a standalone manual test script for the RAG utilities.
 - **Context and Reasons for Changes**: The user wants an isolated check of parser, chunker, and retriever before any Flask integration.
-=======
 - **Prompt**: give me the command- do not do that
 ### **New Interaction**
 
@@ -321,7 +313,6 @@ Do not connect it to Flask yet. I just want to verify that the RAG utility funct
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 15:33
 - **Prompt**: Already up to date. git add . echo "frontend/node_modules/" >> .gitignore  git add .gitignore  git commit -m 'Redesign UI"   quote> git push origin main quote>  i dont think it work
->>>>>>> 887a43954309304d02f5b4dd1e30c74634d59ae5
 
 ### **New Interaction**
 - **Hook Version**: 1.02
