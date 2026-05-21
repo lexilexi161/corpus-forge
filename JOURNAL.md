@@ -134,3 +134,24 @@
 - **Socratic Mode**: OFF
 - **Changes Made**: Updated `documentation/database_architecture.md` to reflect `backend/database/schema.sql` additions (`user`, `session`, `cost`) and added a note stating the file was moved from `misc docs/database_architecture.md` to `documentation/database_architecture.md` on 2026-05-18.
 - **Context and Reasons for Changes**: User requested the documentation be updated to reflect recent schema changes and to note the file relocation.
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 18-05-2026 14:45
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: why i can not run npm run dev
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes; identified that the dev script is defined in frontend/package.json, not the repo root.
+- **Context and Reasons for Changes**: Logged the prompt and the repository location of the Vite dev script so the failure can be explained directly.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 21-05-2026 09:27
+- **Prompt**: if i forgot to pull before code is that a problem?
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 21-05-2026 10:01
+- **Prompt**: what should i do chore: log prompt [21-05-2026 09:27]  # Conflicts: #       JOURNAL.md #       prompts_history.md  # Please enter the commit message for your changes. Lines starting # with '#' will be ignored, and an empty message aborts the commit. # # interactive rebase in progress; onto eda2750 # Last command done (1 command done): #    pick ff78180 # chore: log prompt [21-05-2026 09:27] # Next commands to do (4 remaining commands): #    pick fcb86ee # chore: log prompt [21-05-2026 09:28] #    pick aa1bdfc # chore: log prompt [21-05-2026 09:29] # You are currently rebasing branch 'feature/chloe/frontend' on 'eda 2750'. # # Changes to be committed: #       modified:   JOURNAL.md #       new file:   frontend/dist/assets/index-BA3exVfR.js #       new file:   frontend/dist/index.html #       modified:   prompts_history.md # ~                                                                    ~                                                                    W10: Warning: Changing a readonly file
