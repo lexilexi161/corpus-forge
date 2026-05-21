@@ -376,3 +376,27 @@ Do not modify files yet. I want to understand:
 - **Hook Version**: 1.02
 - **Date**: 22-05-2026 01:35
 - **Prompt**: Help me test the updated document upload route manually.  Show me how to run the Flask backend and how to upload a sample txt/md/py file using curl or Postman.  I want to confirm that: 1. the file uploads successfully 2. the text is parsed 3. chunks are created 4. the JSON response includes chunk_count
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 22-05-2026 01:36
+- **User**: victor.oganwo@epita.fr
+- **Prompt**: Help me test the updated document upload route manually.
+
+Show me how to run the Flask backend and how to upload a sample txt/md/py file using curl or Postman.
+
+I want to confirm that:
+1. the file uploads successfully
+2. the text is parsed
+3. chunks are created
+4. the JSON response includes chunk_count
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes. Provided manual test steps for running Flask and uploading txt/md/py files via curl or Postman.
+- **Context and Reasons for Changes**: The user requested a manual verification workflow for the updated upload route and chunk_count response.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 22-05-2026 01:41
+- **Prompt**: NOTHING bro
