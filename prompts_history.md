@@ -59,3 +59,6 @@
 ### 21-05-2026 16:16
 - **Prompt**: Resolve the merge conflicts in JOURNAL.md. Keep BOTH sides of every conflict because both contain valid journal entries from different teammates. Remove only the conflict markers: <<<<<<< HEAD, =======, and >>>>>>>. Do not delete Victorâ€™s RAG entries and do not delete the node_modules/git entries from the other teammate. Only edit JOURNAL.md.
 
+### 22-05-2026 00:38
+- **Prompt**: I am working on the next step of the RAG feature for our Corpus Forge Flask app.  We already have backend/rag/parser.py, chunker.py, and retriever.py.  Please inspect the current backend upload route, database files, and RAG utilities. Explain how we should connect document upload to parsing and chunking.  Do not modify files yet. I want to understand: 1. where uploaded files are currently saved 2. where document metadata is stored 3. whether chunks can already be saved to the database 4. which file should be edited first 5. the smallest safe implementation plan
+
