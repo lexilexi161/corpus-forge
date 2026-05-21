@@ -155,3 +155,14 @@
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 15:21
 - **Prompt**: i want to push in main but i dont wanna push node-module on it
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 21-05-2026 15:24
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: i want to push in main but i dont wanna push node-module on it
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Added frontend/node_modules/ to .gitignore and removed tracked frontend/node_modules files from the index so future pushes exclude them.
+- **Context and Reasons for Changes**: The repository was tracking frontend/node_modules, so untracking it is required before pushing from main without those files.
