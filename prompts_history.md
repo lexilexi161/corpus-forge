@@ -29,3 +29,6 @@
 ### 21-05-2026 15:21
 - **Prompt**: Help me implement backend/rag/parser.py only.  It should extract text from .txt, .md, .py, .js, and .pdf files.  For text/source files, read with UTF-8 and handle encoding errors safely. For PDF, use pypdf if available, and give a clear error if it is not installed.  Please keep the code simple, readable, and beginner-friendly. Add error handling for unsupported file types, missing files, and empty files.
 
+### 21-05-2026 15:24
+- **Prompt**: Help me implement backend/rag/chunker.py only.  I need a simple fixed-size chunking function with overlap for RAG.  Function: chunk_text(text, chunk_size=1000, overlap=200)  Each returned chunk should include: - chunk_index - text - start_char - end_char  Handle empty text, short documents, and invalid overlap values. Keep it simple and easy to explain in the presentation.
+
