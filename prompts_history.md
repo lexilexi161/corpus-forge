@@ -26,3 +26,6 @@
 ### 21-05-2026 15:19
 - **Prompt**: can u explain this is very simple terms
 
+### 21-05-2026 15:21
+- **Prompt**: Help me implement backend/rag/parser.py only.  It should extract text from .txt, .md, .py, .js, and .pdf files.  For text/source files, read with UTF-8 and handle encoding errors safely. For PDF, use pypdf if available, and give a clear error if it is not installed.  Please keep the code simple, readable, and beginner-friendly. Add error handling for unsupported file types, missing files, and empty files.
+

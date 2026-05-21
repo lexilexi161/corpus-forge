@@ -159,3 +159,19 @@ Please inspect the current backend structure and explain how the new backend/rag
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 15:19
 - **Prompt**: can u explain this is very simple terms
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 21-05-2026 15:19
+- **User**: victor.oganwo@epita.fr
+- **Prompt**: can u explain this is very simple terms
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes. Provided a simpler explanation of how the backend RAG pieces fit together.
+- **Context and Reasons for Changes**: The user asked for a very simple explanation of the previously reviewed backend structure, so this entry records the clarification-only response.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 21-05-2026 15:21
+- **Prompt**: Help me implement backend/rag/parser.py only.  It should extract text from .txt, .md, .py, .js, and .pdf files.  For text/source files, read with UTF-8 and handle encoding errors safely. For PDF, use pypdf if available, and give a clear error if it is not installed.  Please keep the code simple, readable, and beginner-friendly. Add error handling for unsupported file types, missing files, and empty files.
