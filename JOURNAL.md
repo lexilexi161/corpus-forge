@@ -228,3 +228,28 @@ Keep it simple and easy to explain in the presentation.
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 15:28
 - **Prompt**: Help me implement backend/rag/retriever.py only.  For now, I want a simple keyword-based retriever before we add vector search.  Functions: - normalize_text(text) - score_chunk(query, chunk_text) - retrieve_relevant_chunks(query, chunks, top_k=5)  The retriever should compare a user question with document chunks and return the most relevant chunks using keyword overlap. Keep the implementation simple and explainable.
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 21-05-2026 15:28
+- **User**: victor.oganwo@epita.fr
+- **Prompt**: Help me implement backend/rag/retriever.py only.
+
+For now, I want a simple keyword-based retriever before we add vector search.
+
+Functions:
+- normalize_text(text)
+- score_chunk(query, chunk_text)
+- retrieve_relevant_chunks(query, chunks, top_k=5)
+
+The retriever should compare a user question with document chunks and return the most relevant chunks using keyword overlap. Keep the implementation simple and explainable.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes yet. Preparing to implement simple keyword-overlap retrieval in retriever.py.
+- **Context and Reasons for Changes**: The task is limited to backend/rag/retriever.py, so the journal records the request before the code edit.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 21-05-2026 15:30
+- **Prompt**: Help me create a small manual test for the backend/rag module.  I want to test: 1. parsing a text file 2. chunking the extracted text 3. retrieving relevant chunks from a sample query  Do not connect it to Flask yet. I just want to verify that the RAG utility functions work independently first.
