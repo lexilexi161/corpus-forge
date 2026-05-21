@@ -139,3 +139,23 @@
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 15:16
 - **Prompt**: I am working on the AI/RAG part of our Corpus Forge Flask capstone project.  My task is to build the first RAG foundation: document parsing, text chunking, and simple retrieval.  Please inspect the current backend structure and explain how the new backend/rag module should fit into the project. Do not modify files yet. I want to understand how parser.py, chunker.py, and retriever.py will later connect to document upload and chat routes.
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 21-05-2026 15:17
+- **User**: victor.oganwo@epita.fr
+- **Prompt**: I am working on the AI/RAG part of our Corpus Forge Flask capstone project.
+
+My task is to build the first RAG foundation: document parsing, text chunking, and simple retrieval.
+
+Please inspect the current backend structure and explain how the new backend/rag module should fit into the project. Do not modify files yet. I want to understand how parser.py, chunker.py, and retriever.py will later connect to document upload and chat routes.
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes. Reviewed the current Flask backend entry points, the standalone FastAPI prototype, and the RAG helper stubs to map the future integration points.
+- **Context and Reasons for Changes**: The user asked for a structural explanation only, so the work focused on reading the backend wiring and clarifying how parsing, chunking, and retrieval will connect to upload and chat flows.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 21-05-2026 15:19
+- **Prompt**: can u explain this is very simple terms
