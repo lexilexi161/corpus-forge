@@ -23,3 +23,6 @@
 ### 21-05-2026 15:19
 - **Prompt**: how can i push without node modules part?
 
+### 21-05-2026 15:21
+- **Prompt**: i want to push in main but i dont wanna push node-module on it
+
