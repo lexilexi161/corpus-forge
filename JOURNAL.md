@@ -645,3 +645,47 @@ Explain:
 - **Hook Version**: 1.02
 - **Date**: 22-05-2026 11:25
 - **Prompt**: Now add Gemini integration using the current official Google GenAI SDK.  Create a new file:  backend/rag/gemini_client.py  Requirements: - Use the google-genai package with: from google import genai - Read the API key from the GEMINI_API_KEY environment variable. - Do not hardcode any API key. - Do not use backend/main.py as the main reference because the active Flask app is backend/app.py. - Keep Gemini logic separate from chat.py.  Create a function:  generate_answer(question, retrieved_chunks, audience_level="beginner", tone="simple", output_format="paragraph")  The function should: 1. build a grounded prompt using the user question and retrieved chunks 2. include prompt steering options: audience level, tone, and output format 3. tell Gemini to answer only using the retrieved context when possible 4. tell Gemini to say the uploaded documents do not contain enough information if the context is insufficient 5. return the Gemini answer as a string 6. handle missing GEMINI_API_KEY with a clear error 7. handle Gemini API errors without crashing the backend  Do not modify chat.py yet. Do not modify frontend files. Keep the code simple and easy to explain.
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 22-05-2026 11:26
+- **User**: victor.oganwo@epita.fr
+- **Prompt**: Now add Gemini integration using the current official Google GenAI SDK.
+
+Create a new file:
+
+backend/rag/gemini_client.py
+
+Requirements:
+- Use the google-genai package with: from google import genai
+- Read the API key from the GEMINI_API_KEY environment variable.
+- Do not hardcode any API key.
+- Do not use backend/main.py as the main reference because the active Flask app is backend/app.py.
+- Keep Gemini logic separate from chat.py.
+
+Create a function:
+
+generate_answer(question, retrieved_chunks, audience_level="beginner", tone="simple", output_format="paragraph")
+
+The function should:
+1. build a grounded prompt using the user question and retrieved chunks
+2. include prompt steering options: audience level, tone, and output format
+3. tell Gemini to answer only using the retrieved context when possible
+4. tell Gemini to say the uploaded documents do not contain enough information if the context is insufficient
+5. return the Gemini answer as a string
+6. handle missing GEMINI_API_KEY with a clear error
+7. handle Gemini API errors without crashing the backend
+
+Do not modify chat.py yet.
+Do not modify frontend files.
+Keep the code simple and easy to explain.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes yet. Preparing a standalone Gemini client module that uses the official google-genai SDK and reads GEMINI_API_KEY.
+- **Context and Reasons for Changes**: The user wants Gemini logic isolated from chat.py and based on the official current SDK.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 22-05-2026 11:47
+- **Prompt**: Update requirements.txt for Gemini integration.  Add google-genai if it is not already present. Do not remove existing requirements. Do not add unnecessary packages.
