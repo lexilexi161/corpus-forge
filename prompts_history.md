@@ -86,3 +86,6 @@
 ### 22-05-2026 10:00
 - **Prompt**: so were js creating the dummy now gemini would be the brain?
 
+### 22-05-2026 10:02
+- **Prompt**: Now implement the smallest safe version of retrieval in the Flask chat route.  Scope: - Only edit backend/routes/chat.py unless a small database helper is clearly needed. - Do not connect Gemini yet. - The chat route should accept a user question/message from JSON. - It should load saved chunks from the database or current storage. - It should call retrieve_relevant_chunks(query, chunks, top_k=5). - It should return JSON containing:   - the original question   - the retrieved chunks   - chunk_count   - a temporary message saying Gemini is not connected yet  Keep the code simple and easy to explain. Do not modify frontend. Do not rewrite the backend. Do not change the database schema unless absolutely necessary.
+
