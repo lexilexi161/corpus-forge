@@ -567,3 +567,27 @@ Do not change the database schema unless absolutely necessary.
 - **Hook Version**: 1.02
 - **Date**: 22-05-2026 10:06
 - **Prompt**: Help me manually test the updated chat route on Windows PowerShell.  Show me: 1. how to run the Flask backend 2. how to upload a sample text file first if needed 3. how to send a chat question to the chat endpoint using curl or PowerShell 4. what JSON response I should expect if retrieval works  Do not change code unless the test reveals a clear bug.
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 22-05-2026 10:07
+- **User**: victor.oganwo@epita.fr
+- **Prompt**: Help me manually test the updated chat route on Windows PowerShell.
+
+Show me:
+1. how to run the Flask backend
+2. how to upload a sample text file first if needed
+3. how to send a chat question to the chat endpoint using curl or PowerShell
+4. what JSON response I should expect if retrieval works
+
+Do not change code unless the test reveals a clear bug.
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes. Prepared manual test steps for the retrieval-only chat route on Windows PowerShell.
+- **Context and Reasons for Changes**: The user requested a manual verification workflow for the chat endpoint before any Gemini integration.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 22-05-2026 10:11
+- **Prompt**: try and load it that when i try to put the venv line the terminal displays red

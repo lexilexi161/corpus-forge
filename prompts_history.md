@@ -92,3 +92,6 @@
 ### 22-05-2026 10:06
 - **Prompt**: Help me manually test the updated chat route on Windows PowerShell.  Show me: 1. how to run the Flask backend 2. how to upload a sample text file first if needed 3. how to send a chat question to the chat endpoint using curl or PowerShell 4. what JSON response I should expect if retrieval works  Do not change code unless the test reveals a clear bug.
 
+### 22-05-2026 10:11
+- **Prompt**: try and load it that when i try to put the venv line the terminal displays red
+
