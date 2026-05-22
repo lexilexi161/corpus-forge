@@ -83,3 +83,6 @@
 ### 22-05-2026 09:54
 - **Prompt**: I have already connected document upload to RAG parsing and chunking, and I added requirements/setup instructions.  Now I want to connect the chat route to retrieval, but not Gemini yet.  Please inspect: - backend/routes/chat.py - backend/routes/documents.py - backend/rag/retriever.py - backend/database/schema.sql - any database helper files  Do not modify anything yet.  Explain: 1. what the current chat route does 2. where chunks are saved after document upload 3. how the chat route can load chunks 4. how retrieve_relevant_chunks() should be used 5. the smallest safe implementation plan
 
+### 22-05-2026 10:00
+- **Prompt**: so were js creating the dummy now gemini would be the brain?
+
