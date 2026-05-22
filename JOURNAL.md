@@ -607,3 +607,41 @@ Do not change code unless the test reveals a clear bug.
 - **Hook Version**: 1.02
 - **Date**: 22-05-2026 10:38
 - **Prompt**: I have connected the chat route to retrieve relevant chunks from uploaded documents.  Now I want to add Gemini integration safely.  Please inspect: - backend/routes/chat.py - backend/rag/retriever.py - backend/routes/documents.py - backend/database/schema.sql - requirements.txt - README.md - any config/env files  Do not modify files yet.  Explain: 1. how the current chat route works 2. where retrieved chunks are available 3. where Gemini integration should be added 4. how we should store the Gemini API key safely using an environment variable 5. whether requirements.txt needs a new package 6. how token/request tracking could be updated later 7. the smallest safe implementation plan
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 22-05-2026 10:38
+- **User**: victor.oganwo@epita.fr
+- **Prompt**: I have connected the chat route to retrieve relevant chunks from uploaded documents.
+
+Now I want to add Gemini integration safely.
+
+Please inspect:
+- backend/routes/chat.py
+- backend/rag/retriever.py
+- backend/routes/documents.py
+- backend/database/schema.sql
+- requirements.txt
+- README.md
+- any config/env files
+
+Do not modify files yet.
+
+Explain:
+1. how the current chat route works
+2. where retrieved chunks are available
+3. where Gemini integration should be added
+4. how we should store the Gemini API key safely using an environment variable
+5. whether requirements.txt needs a new package
+6. how token/request tracking could be updated later
+7. the smallest safe implementation plan
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes. Reviewed chat, retrieval, upload, schema, requirements, README, and config/env state to plan safe Gemini integration.
+- **Context and Reasons for Changes**: The user requested guidance before connecting Gemini, so the task focused on locating the right insertion point and dependency requirements.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 22-05-2026 11:25
+- **Prompt**: Now add Gemini integration using the current official Google GenAI SDK.  Create a new file:  backend/rag/gemini_client.py  Requirements: - Use the google-genai package with: from google import genai - Read the API key from the GEMINI_API_KEY environment variable. - Do not hardcode any API key. - Do not use backend/main.py as the main reference because the active Flask app is backend/app.py. - Keep Gemini logic separate from chat.py.  Create a function:  generate_answer(question, retrieved_chunks, audience_level="beginner", tone="simple", output_format="paragraph")  The function should: 1. build a grounded prompt using the user question and retrieved chunks 2. include prompt steering options: audience level, tone, and output format 3. tell Gemini to answer only using the retrieved context when possible 4. tell Gemini to say the uploaded documents do not contain enough information if the context is insufficient 5. return the Gemini answer as a string 6. handle missing GEMINI_API_KEY with a clear error 7. handle Gemini API errors without crashing the backend  Do not modify chat.py yet. Do not modify frontend files. Keep the code simple and easy to explain.
