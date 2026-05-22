@@ -77,3 +77,6 @@
 ### 22-05-2026 09:50
 - **Prompt**: I have connected the document upload route to the RAG parser and chunker.  Now I want to make the backend easier to run for the team.  Please inspect the backend imports and create a requirements.txt file at the project root if it does not exist.  Include only the packages that are currently needed, such as Flask, flask-cors, and pypdf.  Do not modify frontend files. Do not modify the RAG logic. Do not add unnecessary packages.
 
+### 22-05-2026 09:50
+- **Prompt**: Update README.md with simple local setup instructions for the current project.  Include: 1. how to create/activate the Python virtual environment on Windows 2. how to install requirements.txt 3. how to run the Flask backend 4. how to run the frontend if needed 5. the backend URL http://127.0.0.1:5000  Keep it short and beginner-friendly. Do not change code files.
+
