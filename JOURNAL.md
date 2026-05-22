@@ -458,3 +458,29 @@ Do not add unnecessary packages.
 - **Hook Version**: 1.02
 - **Date**: 22-05-2026 09:50
 - **Prompt**: Update README.md with simple local setup instructions for the current project.  Include: 1. how to create/activate the Python virtual environment on Windows 2. how to install requirements.txt 3. how to run the Flask backend 4. how to run the frontend if needed 5. the backend URL http://127.0.0.1:5000  Keep it short and beginner-friendly. Do not change code files.
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 22-05-2026 09:51
+- **User**: victor.oganwo@epita.fr
+- **Prompt**: Update README.md with simple local setup instructions for the current project.
+
+Include:
+1. how to create/activate the Python virtual environment on Windows
+2. how to install requirements.txt
+3. how to run the Flask backend
+4. how to run the frontend if needed
+5. the backend URL http://127.0.0.1:5000
+
+Keep it short and beginner-friendly.
+Do not change code files.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes yet. Preparing a short beginner-friendly README setup section for local development.
+- **Context and Reasons for Changes**: The README is currently minimal, so this request adds concise setup instructions without changing code.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 22-05-2026 09:54
+- **Prompt**: I have already connected document upload to RAG parsing and chunking, and I added requirements/setup instructions.  Now I want to connect the chat route to retrieval, but not Gemini yet.  Please inspect: - backend/routes/chat.py - backend/routes/documents.py - backend/rag/retriever.py - backend/database/schema.sql - any database helper files  Do not modify anything yet.  Explain: 1. what the current chat route does 2. where chunks are saved after document upload 3. how the chat route can load chunks 4. how retrieve_relevant_chunks() should be used 5. the smallest safe implementation plan
