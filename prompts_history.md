@@ -24,10 +24,8 @@
 - **Prompt**: I am working on the AI/RAG part of our Corpus Forge Flask capstone project.  My task is to build the first RAG foundation: document parsing, text chunking, and simple retrieval.  Please inspect the current backend structure and explain how the new backend/rag module should fit into the project. Do not modify files yet. I want to understand how parser.py, chunker.py, and retriever.py will later connect to document upload and chat routes.
 
 ### 21-05-2026 15:19
-- **Prompt**: can u explain this is very simple terms
 
 ### 21-05-2026 15:21
-- **Prompt**: Help me implement backend/rag/parser.py only.  It should extract text from .txt, .md, .py, .js, and .pdf files.  For text/source files, read with UTF-8 and handle encoding errors safely. For PDF, use pypdf if available, and give a clear error if it is not installed.  Please keep the code simple, readable, and beginner-friendly. Add error handling for unsupported file types, missing files, and empty files.
 
 ### 21-05-2026 15:24
 - **Prompt**: Help me implement backend/rag/chunker.py only.  I need a simple fixed-size chunking function with overlap for RAG.  Function: chunk_text(text, chunk_size=1000, overlap=200)  Each returned chunk should include: - chunk_index - text - start_char - end_char  Handle empty text, short documents, and invalid overlap values. Keep it simple and easy to explain in the presentation.
@@ -79,6 +77,11 @@
 
 ### 22-05-2026 09:50
 - **Prompt**: Update README.md with simple local setup instructions for the current project.  Include: 1. how to create/activate the Python virtual environment on Windows 2. how to install requirements.txt 3. how to run the Flask backend 4. how to run the frontend if needed 5. the backend URL http://127.0.0.1:5000  Keep it short and beginner-friendly. Do not change code files.
+### 21-05-2026 17:45
+- **Prompt**: why i cannot run npm run dev
+
+### 22-05-2026 10:12
+- **Prompt**: CONFLICT (content): Merge conflict in JOURNAL.md Auto-merging prompts_history.md CONFLICT (content): Merge conflict in prompts_history.md error: could not apply 5754dff... chore: log prompt [21-05-2026 17:45] hint: Resolve all conflicts manually, mark them as resolved with hint: "git add/rm <conflicted_files>", then run "git rebase --continue". hint: You can instead skip this commit: run "git rebase --skip". hint: To abort and get back to the state before "git rebase", run "git rebase --abort". hint: Disable this message with "git config set advice.mergeConflict false" Could not apply 5754dff... # chore: log prompt [21-05-2026 17:45]
 
 ### 22-05-2026 09:54
 - **Prompt**: I have already connected document upload to RAG parsing and chunking, and I added requirements/setup instructions.  Now I want to connect the chat route to retrieval, but not Gemini yet.  Please inspect: - backend/routes/chat.py - backend/routes/documents.py - backend/rag/retriever.py - backend/database/schema.sql - any database helper files  Do not modify anything yet.  Explain: 1. what the current chat route does 2. where chunks are saved after document upload 3. how the chat route can load chunks 4. how retrieve_relevant_chunks() should be used 5. the smallest safe implementation plan
