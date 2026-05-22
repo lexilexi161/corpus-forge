@@ -427,3 +427,8 @@ I want to confirm that:
 - **Socratic Mode**: ON
 - **Changes Made**: No code changes.
 - **Context and Reasons for Changes**: User asked whether the local 127.0.0.1 page is accessible based on the screenshot.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 22-05-2026 09:50
+- **Prompt**: I have connected the document upload route to the RAG parser and chunker.  Now I want to make the backend easier to run for the team.  Please inspect the backend imports and create a requirements.txt file at the project root if it does not exist.  Include only the packages that are currently needed, such as Flask, flask-cors, and pypdf.  Do not modify frontend files. Do not modify the RAG logic. Do not add unnecessary packages.

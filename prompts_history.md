@@ -74,3 +74,6 @@
 ### 22-05-2026 01:42
 - **Prompt**: Can u see the image the 127. stuff is accessible
 
+### 22-05-2026 09:50
+- **Prompt**: I have connected the document upload route to the RAG parser and chunker.  Now I want to make the backend easier to run for the team.  Please inspect the backend imports and create a requirements.txt file at the project root if it does not exist.  Include only the packages that are currently needed, such as Flask, flask-cors, and pypdf.  Do not modify frontend files. Do not modify the RAG logic. Do not add unnecessary packages.
+
