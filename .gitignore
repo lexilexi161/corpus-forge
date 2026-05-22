@@ -23,5 +23,3 @@ chroma_db/
 # OS/editor files
 .DS_Store
 .vscode/
-node_modules/
-package-lock.json

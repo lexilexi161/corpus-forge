@@ -1,37 +1,282 @@
 import React, { useState } from "react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
-type NavItem = "Chat" | "Flashcards" | "Quiz" | "Code Analysis" | "Cost";
+type NavItem = "Chat" | "Flashcards" | "Quiz" | "Code Analysis" | "Cost" | "Profile";
 type Doc = { id: string; name: string; type: "PDF" | "MD" | "PY"; checked: boolean };
 type Message = { role: "user" | "ai"; content: string };
 
 // ── Constants ──────────────────────────────────────────────────────────────
-const INITIAL_DOCS: Doc[] = [];
-
-const TYPE_STYLE: Record<string, { bg: string; color: string }> = {
-  PDF: { bg: "#F0F0F0", color: "#333333" },
-  MD:  { bg: "#F0F0F0", color: "#333333" },
-  PY:  { bg: "#F0F0F0", color: "#333333" },
-};
-
 const QUICK_ACTIONS = [
-  { label: "Flashcards" },
-  { label: "Quiz" },
-  { label: "Code Review" },
-  { label: "Summarise" },
-  { label: "Q&A" },
+  { label: "Flashcards", icon: "🃏" },
+  { label: "Quiz", icon: "📝" },
+  { label: "Code Review", icon: "💻" },
+  { label: "Summarise", icon: "✦" },
+  { label: "Q&A", icon: "💬" },
 ];
 
-const NAV: { label: NavItem }[] = [
-  { label: "Chat"          },
-  { label: "Flashcards"    },
-  { label: "Quiz"          },
-  { label: "Code Analysis" },
-  { label: "Cost"          },
+const NAV: { label: NavItem; icon: React.ReactNode }[] = [
+  {
+    label: "Chat",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+  },
+  { label: "Flashcards", icon: <span className="nav-emoji">🃏</span> },
+  { label: "Quiz", icon: <span className="nav-emoji">📝</span> },
+  { label: "Code Analysis", icon: <span className="nav-emoji">💻</span> },
+  {
+    label: "Cost",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+      </svg>
+    ),
+  },
+  {
+    label: "Profile",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    ),
+  },
 ];
 
-// ── Chat page (hero when empty, chat when messages exist) ─────────────────
-function ChatPage({ docs, toggleDoc }: { docs: Doc[]; toggleDoc: (id: string) => void }) {
+const STORAGE_KEY = "corpusforge_user";
+
+type StoredUser = { name: string; email: string };
+
+function loadStoredUser(): StoredUser | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredUser;
+    if (parsed?.name && parsed?.email) return parsed;
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function saveStoredUser(user: StoredUser) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+}
+
+function clearStoredUser() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+// ── Login Page (full screen) ───────────────────────────────────────────────
+function LoginPage({ onLogin }: { onLogin: (user: StoredUser) => void }) {
+  const [view, setView] = useState<"providers" | "email">("providers");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    if (isSignUp) {
+      if (!name.trim()) {
+        setError("Please enter your name.");
+        return;
+      }
+      const user = { name: name.trim(), email: email.trim().toLowerCase() };
+      saveStoredUser(user);
+      onLogin(user);
+      return;
+    }
+    const stored = loadStoredUser();
+    if (stored && stored.email === email.trim().toLowerCase()) {
+      onLogin(stored);
+      return;
+    }
+    setError("No account found for this email. Sign up first.");
+  };
+
+  const handleSocial = (provider: string) => {
+    const user = { name: `${provider} User`, email: `${provider.toLowerCase()}@corpusforge.local` };
+    saveStoredUser(user);
+    onLogin(user);
+  };
+
+  const handleGoogle = () => {
+    const user = { name: "User", email: "google@corpusforge.local" };
+    saveStoredUser(user);
+    onLogin(user);
+  };
+
+  return (
+    <div className="login-page">
+      <div className="login-page-glow" aria-hidden />
+
+      <div className="login-page-inner">
+        <div className="login-page-brand">
+          <div className="login-page-logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <span className="login-page-brand-name">CorpusForge</span>
+        </div>
+
+        <h1 className="login-page-headline">
+          Build flashcards, quizzes,
+          <br />
+          and insights from your corpus
+        </h1>
+
+        {view === "providers" ? (
+          <div className="login-page-actions">
+            <button type="button" className="login-btn-google" onClick={handleGoogle}>
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+              Continue with Google
+            </button>
+
+            <div className="login-social-row">
+              <button type="button" className="login-social-btn" onClick={() => handleSocial("GitHub")} aria-label="Continue with GitHub">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </button>
+              <button type="button" className="login-social-btn" onClick={() => handleSocial("Apple")} aria-label="Continue with Apple">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                </svg>
+              </button>
+              <button type="button" className="login-social-btn" onClick={() => handleSocial("Facebook")} aria-label="Continue with Facebook">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+              </button>
+            </div>
+
+            <button type="button" className="login-btn-email" onClick={() => { setView("email"); setError(""); }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              Continue with email
+            </button>
+          </div>
+        ) : (
+          <div className="login-page-email-panel">
+            <button
+              type="button"
+              className="login-back-btn"
+              onClick={() => {
+                setView("providers");
+                setError("");
+              }}
+            >
+              ← Back
+            </button>
+
+            <h2 className="login-email-title">{isSignUp ? "Create your account" : "Sign in with email"}</h2>
+            <p className="login-email-sub">Your name will appear in chat and profile.</p>
+
+            <form className="login-email-form" onSubmit={handleEmailSubmit}>
+              {isSignUp && (
+                <input
+                  className="login-email-input"
+                  type="text"
+                  placeholder="Full name"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setError("");
+                  }}
+                />
+              )}
+              <input
+                className="login-email-input"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError("");
+                }}
+              />
+              <input
+                className="login-email-input"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError("");
+                }}
+              />
+              {error && <p className="login-email-error">{error}</p>}
+              <button type="submit" className="login-btn-submit">
+                {isSignUp ? "Create account" : "Sign in"}
+              </button>
+            </form>
+
+            <p className="login-email-switch">
+              {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+              <button
+                type="button"
+                className="login-email-switch-btn"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError("");
+                }}
+              >
+                {isSignUp ? "Sign in" : "Sign up"}
+              </button>
+            </p>
+          </div>
+        )}
+
+        <p className="login-page-legal">
+          By continuing, you agree to our{" "}
+          <a href="#" className="login-legal-link" onClick={(e) => e.preventDefault()}>
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="#" className="login-legal-link" onClick={(e) => e.preventDefault()}>
+            Privacy Policy
+          </a>
+          .
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Chat Page ──────────────────────────────────────────────────────────────
+function ChatPage({
+  docs,
+  toggleDoc,
+  userName,
+  isLoggedIn,
+  onRequireLogin,
+}: {
+  docs: Doc[];
+  toggleDoc: (id: string) => void;
+  userName: string;
+  isLoggedIn: boolean;
+  onRequireLogin: () => void;
+}) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const bottomRef = React.useRef<HTMLDivElement>(null);
@@ -43,67 +288,135 @@ function ChatPage({ docs, toggleDoc }: { docs: Doc[]; toggleDoc: (id: string) =>
   const send = (text?: string) => {
     const content = text ?? input;
     if (!content.trim()) return;
+    if (!isLoggedIn) {
+      onRequireLogin();
+      return;
+    }
     const userMsg: Message = { role: "user", content };
-    const aiMsg: Message = { role: "ai", content: "This is a mock response. Connect the backend to get real AI answers from your documents." };
+    const aiMsg: Message = {
+      role: "ai",
+      content: "This is a mock response. Connect the backend to get real AI answers from your documents.",
+    };
     setMessages((prev) => [...prev, userMsg, aiMsg]);
     setInput("");
   };
 
   const hasMessages = messages.length > 0;
+  const firstName = userName.split(" ")[0];
+  const greeting = isLoggedIn ? `What's new, ${firstName}?` : "What do you want to explore?";
 
   return (
     <div className="chat-page">
-      <div className="active-docs-bar">
-        <span className="active-docs-label">Context:</span>
-        {docs.length === 0 ? (
-          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>No documents — upload files first.</span>
-        ) : (
-          docs.map((doc) => (
+      {docs.length > 0 && (
+        <div className="active-docs-bar">
+          <span className="active-docs-label">Context</span>
+          {docs.map((doc) => (
             <label key={doc.id} className={`doc-chip ${doc.checked ? "checked" : ""}`}>
               <input type="checkbox" checked={doc.checked} onChange={() => toggleDoc(doc.id)} style={{ display: "none" }} />
               {doc.name}
             </label>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className="chat-scroll">
         {!hasMessages ? (
           <div className="hero">
-            <h1 className="hero-title">What do you want to explore?</h1>
-            <p className="hero-sub">Upload documents and ask anything — or pick a quick action below.</p>
+            <div className="hero-greeting">
+              <span className="hero-mark" aria-hidden>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </span>
+              <h1 className="hero-title">{greeting}</h1>
+            </div>
+
             <div className="hero-input-wrap">
               <textarea
                 className="hero-input"
-                placeholder="Ask something about your corpus…"
+                placeholder="How can I help you today?"
                 value={input}
-                rows={3}
+                rows={2}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    send();
+                  }
+                }}
               />
-              <div className="hero-input-footer">
-                <div className="hero-pills">
-                  {QUICK_ACTIONS.map((a) => (
-                    <button key={a.label} className="hero-pill" onClick={() => send(a.label)}>
-                      {a.label}
-                    </button>
-                  ))}
+              <div className="hero-input-toolbar">
+                <div className="hero-toolbar-left">
+                  <button type="button" className="toolbar-icon-btn" title="Add attachment" aria-label="Add">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                  <button type="button" className="toolbar-chip">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    Research
+                  </button>
                 </div>
-                <button className="hero-send" onClick={() => send()} disabled={!input.trim()}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-                  </svg>
-                </button>
+                <div className="hero-toolbar-right">
+                  <button type="button" className="model-select">
+                    Corpus AI
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    className="hero-send"
+                    onClick={() => send()}
+                    disabled={!input.trim()}
+                    aria-label="Send"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="12" y1="19" x2="12" y2="5" />
+                      <polyline points="5 12 12 5 19 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
+
+            <div className="hero-quick-row">
+              {QUICK_ACTIONS.map((a) => (
+                <button key={a.label} type="button" className="hero-quick-btn" onClick={() => send(a.label)}>
+                  <span className="hero-quick-icon">{a.icon}</span>
+                  {a.label}
+                </button>
+              ))}
+            </div>
+
+            {!isLoggedIn && (
+              <p className="hero-login-hint">
+                <button type="button" className="hero-login-link" onClick={onRequireLogin}>
+                  Sign in
+                </button>{" "}
+                to use your name and save your work.
+              </p>
+            )}
           </div>
         ) : (
           <div className="chat-messages">
             {messages.map((msg, i) => (
               <div key={i} className={`msg-row ${msg.role}`}>
-                {msg.role === "ai" && <div className="avatar ai-avatar">AI</div>}
+                {msg.role === "ai" && (
+                  <div className="avatar ai-avatar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                )}
                 <div className={`bubble ${msg.role === "ai" ? "ai-bubble" : "user-bubble"}`}>{msg.content}</div>
-                {msg.role === "user" && <div className="avatar user-avatar">U</div>}
+                {msg.role === "user" && (
+                  <div className="avatar user-avatar">{userName.slice(0, 2).toUpperCase()}</div>
+                )}
               </div>
             ))}
             <div ref={bottomRef} />
@@ -113,9 +426,12 @@ function ChatPage({ docs, toggleDoc }: { docs: Doc[]; toggleDoc: (id: string) =>
 
       {hasMessages && (
         <div className="chat-input-bar">
-          <div className="quick-actions">
+          <div className="hero-quick-row compact">
             {QUICK_ACTIONS.map((a) => (
-              <button key={a.label} className="quick-pill" onClick={() => send(a.label)}>{a.label}</button>
+              <button key={a.label} type="button" className="hero-quick-btn" onClick={() => send(a.label)}>
+                <span className="hero-quick-icon">{a.icon}</span>
+                {a.label}
+              </button>
             ))}
           </div>
           <div className="chat-input-row">
@@ -126,9 +442,10 @@ function ChatPage({ docs, toggleDoc }: { docs: Doc[]; toggleDoc: (id: string) =>
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && send()}
             />
-            <button className="send-btn" onClick={() => send()}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+            <button type="button" className="hero-send" onClick={() => send()} aria-label="Send">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="12" y1="19" x2="12" y2="5" />
+                <polyline points="5 12 12 5 19 12" />
               </svg>
             </button>
           </div>
@@ -138,18 +455,21 @@ function ChatPage({ docs, toggleDoc }: { docs: Doc[]; toggleDoc: (id: string) =>
   );
 }
 
-// ── Placeholder page ───────────────────────────────────────────────────────
-function PlaceholderPage({ label, icon }: { label: string; icon: string }) {
+// ── Placeholder Page ───────────────────────────────────────────────────────
+function PlaceholderPage({ label, icon, onGoChat }: { label: string; icon: string; onGoChat: () => void }) {
   return (
     <div className="placeholder-page">
-      <span style={{ fontSize: 40 }}>{icon}</span>
-      <p className="placeholder-title">{label}</p>
+      <span className="placeholder-icon">{icon}</span>
+      <h2 className="placeholder-title">{label}</h2>
       <p className="placeholder-sub">Use the Chat to generate {label.toLowerCase()} from your documents.</p>
+      <button type="button" className="placeholder-cta" onClick={onGoChat}>
+        Go to Chat
+      </button>
     </div>
   );
 }
 
-// ── Cost page ──────────────────────────────────────────────────────────────
+// ── Cost Page ──────────────────────────────────────────────────────────────
 function CostPage() {
   const stats = [
     { label: "Total Requests", value: "0" },
@@ -158,15 +478,106 @@ function CostPage() {
     { label: "Estimated Cost", value: "$0.000000" },
   ];
   return (
-    <div className="cost-page">
+    <div className="page-shell">
       <h2 className="page-title">Cost & Usage</h2>
       <div className="cost-grid">
         {stats.map((s) => (
-          <div key={s.label} className="cost-card">
-            <p className="cost-value">{s.value}</p>
-            <p className="cost-label">{s.label}</p>
+          <div key={s.label} className="stat-card">
+            <p className="stat-value">{s.value}</p>
+            <p className="stat-label">{s.label}</p>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Profile Page ───────────────────────────────────────────────────────────
+function ProfilePage({
+  userName,
+  userEmail,
+  isLoggedIn,
+  activeDocs,
+  totalDocs,
+  onEditName,
+  onRequireLogin,
+}: {
+  userName: string;
+  userEmail: string;
+  isLoggedIn: boolean;
+  activeDocs: number;
+  totalDocs: number;
+  onEditName: (name: string) => void;
+  onRequireLogin: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(userName);
+
+  const initials = userName
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <div className="page-shell">
+      <h2 className="page-title">Profile</h2>
+      <div className="profile-card">
+        <div className="profile-header">
+          <div className="profile-avatar">{initials || "?"}</div>
+          <div className="profile-info">
+            {editing ? (
+              <form
+                className="profile-edit-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onEditName(draft.trim() || "Guest");
+                  setEditing(false);
+                }}
+              >
+                <input
+                  className="profile-name-input"
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  autoFocus
+                />
+                <button type="submit" className="profile-save-btn">
+                  Save
+                </button>
+              </form>
+            ) : (
+              <>
+                <p className="profile-name">{isLoggedIn ? userName : "Guest"}</p>
+                <p className="profile-plan">
+                  {isLoggedIn ? (userEmail || "Free plan") : "Sign in to see your account"}
+                </p>
+              </>
+            )}
+          </div>
+          {isLoggedIn && !editing && (
+            <button type="button" className="profile-edit-btn" onClick={() => { setDraft(userName); setEditing(true); }}>
+              Edit name
+            </button>
+          )}
+        </div>
+
+        {!isLoggedIn && (
+          <button type="button" className="profile-login-btn" onClick={onRequireLogin}>
+            Sign in
+          </button>
+        )}
+        <div className="profile-stats">
+          <div className="stat-card">
+            <p className="stat-value">{totalDocs}</p>
+            <p className="stat-label">Documents</p>
+          </div>
+          <div className="stat-card">
+            <p className="stat-value">{activeDocs}</p>
+            <p className="stat-label">Active in context</p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -175,50 +586,135 @@ function CostPage() {
 // ── Main App ───────────────────────────────────────────────────────────────
 export default function App() {
   const [activeNav, setActiveNav] = useState<NavItem>("Chat");
-  const [docs, setDocs] = useState<Doc[]>(INITIAL_DOCS);
+  const [docs, setDocs] = useState<Doc[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("Guest");
+  const [userEmail, setUserEmail] = useState("");
+
+  React.useEffect(() => {
+    const stored = loadStoredUser();
+    if (stored) {
+      setUserName(stored.name);
+      setUserEmail(stored.email);
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const checkedCount = docs.filter((d) => d.checked).length;
   const toggleDoc = (id: string) =>
     setDocs((prev) => prev.map((d) => (d.id === id ? { ...d, checked: !d.checked } : d)));
 
-  const renderMain = () => {
-    switch (activeNav) {
-      case "Chat":          return <ChatPage docs={docs} toggleDoc={toggleDoc} />;
-      case "Flashcards":    return <PlaceholderPage label="Flashcards" icon="🃏" />;
-      case "Quiz":          return <PlaceholderPage label="Quiz" icon="📝" />;
-      case "Code Analysis": return <PlaceholderPage label="Code Analysis" icon="🔍" />;
-      case "Cost":          return <CostPage />;
+  const handleLogin = (user: StoredUser) => {
+    setUserName(user.name);
+    setUserEmail(user.email);
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    clearStoredUser();
+    setIsLoggedIn(false);
+    setUserName("Guest");
+    setUserEmail("");
+  };
+
+  const handleEditName = (name: string) => {
+    const trimmed = name.trim() || "Guest";
+    setUserName(trimmed);
+    if (isLoggedIn && userEmail) {
+      saveStoredUser({ name: trimmed, email: userEmail });
     }
   };
+
+  const requireLogin = () => {};
+
+  const initials = isLoggedIn
+    ? userName
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "?";
+
+  const renderMain = () => {
+    switch (activeNav) {
+      case "Chat":
+        return (
+          <ChatPage
+            docs={docs}
+            toggleDoc={toggleDoc}
+            userName={userName}
+            isLoggedIn={isLoggedIn}
+            onRequireLogin={requireLogin}
+          />
+        );
+      case "Flashcards":
+        return <PlaceholderPage label="Flashcards" icon="🃏" onGoChat={() => setActiveNav("Chat")} />;
+      case "Quiz":
+        return <PlaceholderPage label="Quiz" icon="📝" onGoChat={() => setActiveNav("Chat")} />;
+      case "Code Analysis":
+        return <PlaceholderPage label="Code Analysis" icon="💻" onGoChat={() => setActiveNav("Chat")} />;
+      case "Cost":
+        return <CostPage />;
+      case "Profile":
+        return (
+          <ProfilePage
+            userName={userName}
+            userEmail={userEmail}
+            isLoggedIn={isLoggedIn}
+            activeDocs={checkedCount}
+            totalDocs={docs.length}
+            onEditName={handleEditName}
+            onRequireLogin={requireLogin}
+          />
+        );
+    }
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <>
+        <style>{CSS}</style>
+        <LoginPage onLogin={handleLogin} />
+      </>
+    );
+  }
 
   return (
     <>
       <style>{CSS}</style>
       <div className="app">
         <aside className="sidebar">
-          <div className="sidebar-logo">
-            <div className="logo-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <rect x="2" y="3" width="20" height="5" rx="1" /><rect x="2" y="10" width="20" height="5" rx="1" /><rect x="2" y="17" width="20" height="5" rx="1" />
-              </svg>
+          <div className="sidebar-header">
+            <div className="sidebar-logo">
+              <div className="logo-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
+                </svg>
+              </div>
+              <span className="logo-text">CorpusForge</span>
             </div>
-            <span className="logo-text">CorpusForge</span>
-          </div>
-
-          <div className="workspace-pill">
-            <span className="workspace-dot" />
-            <span className="workspace-name">My Workspace</span>
-            <span className="workspace-chevron">›</span>
+            <button type="button" className="new-chat-btn" onClick={() => setActiveNav("Chat")}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              New chat
+            </button>
           </div>
 
           <nav className="sidebar-nav">
-            {NAV.map(({ label }) => (
+            {NAV.map(({ label, icon }) => (
               <button
                 key={label}
+                type="button"
                 className={`nav-item ${activeNav === label ? "active" : ""}`}
                 onClick={() => setActiveNav(label)}
               >
-                <span>{label}</span>
+                <span className="nav-icon-wrap">{icon}</span>
+                {label}
               </button>
             ))}
           </nav>
@@ -232,20 +728,37 @@ export default function App() {
                 <label key={doc.id} className="sidebar-doc">
                   <input type="checkbox" checked={doc.checked} onChange={() => toggleDoc(doc.id)} className="doc-checkbox" />
                   <span className="sidebar-doc-name">{doc.name}</span>
-                  <span className="type-badge" style={{ background: TYPE_STYLE[doc.type].bg, color: TYPE_STYLE[doc.type].color }}>
-                    {doc.type}
-                  </span>
+                  <span className="type-badge">{doc.type}</span>
                 </label>
               ))
             )}
-            <button className="add-doc-btn">+ Add document</button>
+            <button type="button" className="add-doc-btn">
+              + Add document
+            </button>
           </div>
 
-          <div className="sidebar-footer">
-            <span className="token-counter">
-              {checkedCount} doc{checkedCount !== 1 ? "s" : ""} active
-            </span>
-          </div>
+          {isLoggedIn ? (
+            <div className="sidebar-footer-row">
+              <button type="button" className="sidebar-user" onClick={() => setActiveNav("Profile")}>
+                <div className="user-avatar-sm">{initials}</div>
+                <div className="user-details">
+                  <span className="user-name">{userName}</span>
+                  <span className="user-plan">Free plan</span>
+                </div>
+              </button>
+              <button type="button" className="logout-btn" onClick={handleLogout} title="Sign out" aria-label="Sign out">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <button type="button" className="signin-footer-btn" onClick={requireLogin}>
+              Sign in
+            </button>
+          )}
         </aside>
 
         <main className="main">{renderMain()}</main>
@@ -257,191 +770,1002 @@ export default function App() {
 // ── Styles ─────────────────────────────────────────────────────────────────
 const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --accent: #000000;
-    --accent-light: #EDE4D4;
-    --bg: #FAF5ED;
-    --panel: #FAF5ED;
-    --border: #E5DAC8;
-    --text: #111111;
-    --text-muted: #999999;
-    --sidebar-w: 220px;
-    --hero-from: #FAF5ED;
-    --hero-to: #FAF5ED;
+    --accent:        #3756AB;
+    --accent-soft:   #E8EDF8;
+    --accent-hover:  #2C4490;
+    --bg:            #FFFFFF;
+    --panel:         #FFFFFF;
+    --card:          #FFFFFF;
+    --surface-subtle:#F3F4F6;
+    --border:        #E5E7EB;
+    --text:          #1C1A17;
+    --text-muted:    #7A7468;
+    --sidebar-w:     240px;
+    --radius:        14px;
+    --shadow:        0 2px 20px rgba(55, 86, 171, 0.08);
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --accent: #FFFFFF;
-      --accent-light: #1A1A1A;
-      --bg: #0A0A0A; --panel: #111111; --border: #222222;
-      --text: #EEEEEE; --text-muted: #666666;
-      --hero-from: #161616; --hero-to: #0A0A0A;
-    }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
   }
-  body { font-family: 'Montserrat', system-ui, sans-serif; font-size: 13px; background: var(--bg); color: var(--text); }
 
   .app { display: flex; height: 100vh; overflow: hidden; }
-  .main { flex: 1; overflow-y: auto; }
+  .main { flex: 1; overflow-y: auto; background: var(--bg); }
 
-  /* Sidebar */
+  /* ── Sidebar ── */
   .sidebar {
-    width: var(--sidebar-w); min-width: var(--sidebar-w); height: 100vh;
-    background: var(--panel); border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; overflow-y: auto;
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
   }
+
+  .sidebar-header { padding: 16px 14px 8px; }
+
   .sidebar-logo {
-    display: flex; align-items: center; gap: 8px;
-    padding: 16px 14px 12px; border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
   }
+
   .logo-icon {
-    width: 26px; height: 26px; border-radius: 7px; background: var(--text);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
-  .logo-text { font-weight: 700; font-size: 14px; letter-spacing: -0.3px; }
 
-  .workspace-pill {
-    display: flex; align-items: center; gap: 6px;
-    margin: 10px 10px 4px; padding: 7px 10px; border-radius: 8px;
-    background: var(--bg); cursor: pointer; font-size: 12px; font-weight: 500;
+  .logo-text {
+    font-family: 'Lora', Georgia, serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.2px;
   }
-  .workspace-pill:hover { background: var(--border); }
-  .workspace-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
-  .workspace-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .workspace-chevron { color: var(--text-muted); font-size: 14px; }
 
-  .sidebar-nav { padding: 8px 10px; display: flex; flex-direction: column; gap: 1px; }
+  .new-chat-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .new-chat-btn:hover { background: var(--accent-soft); }
+
+  .sidebar-nav {
+    padding: 6px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
   .nav-item {
-    display: flex; align-items: center; width: 100%;
-    padding: 7px 10px; border-radius: 7px; border: none; background: transparent;
-    color: var(--text-muted); cursor: pointer; font-size: 13px; text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
   }
-  .nav-item:hover { background: var(--bg); color: var(--text); }
-  .nav-item.active { background: var(--accent-light); color: var(--text); font-weight: 600; }
 
-  .sidebar-corpus { padding: 12px 10px 8px; border-top: 1px solid var(--border); margin-top: 4px; }
+  .nav-item:hover { background: var(--surface-subtle); color: var(--text); }
+  .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+
+  .nav-icon-wrap {
+    width: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .nav-emoji { font-size: 14px; line-height: 1; }
+
+  .sidebar-corpus {
+    padding: 14px 10px 10px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    flex: 1;
+  }
+
   .sidebar-section-label {
-    font-size: 10px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.6px; color: var(--text-muted); padding: 0 4px; margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding: 0 6px;
+    margin-bottom: 8px;
   }
-  .sidebar-empty-hint { font-size: 11px; color: var(--text-muted); padding: 2px 4px 6px; }
+
+  .sidebar-empty-hint { font-size: 12px; color: var(--text-muted); padding: 0 6px 8px; }
+
   .sidebar-doc {
-    display: flex; align-items: center; gap: 6px; padding: 5px 4px;
-    border-radius: 6px; cursor: pointer; font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
   }
-  .sidebar-doc:hover { background: var(--bg); }
+
+  .sidebar-doc:hover { background: var(--surface-subtle); }
   .sidebar-doc-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .doc-checkbox { accent-color: var(--text); cursor: pointer; flex-shrink: 0; }
-  .type-badge { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; flex-shrink: 0; }
+  .doc-checkbox { accent-color: var(--accent); cursor: pointer; }
+  .type-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--border);
+    color: var(--text-muted);
+  }
+
   .add-doc-btn {
-    width: 100%; margin-top: 6px; padding: 6px; border-radius: 7px;
-    border: 1px dashed var(--border); background: transparent; color: var(--text-muted);
-    font-size: 11px; cursor: pointer;
-  }
-  .add-doc-btn:hover { border-color: var(--text); color: var(--text); }
-  .sidebar-footer {
-    margin-top: auto; padding: 12px 14px;
-    border-top: 1px solid var(--border); font-size: 11px; color: var(--text-muted);
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
   }
 
-  /* Chat page */
+  .add-doc-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 10px 14px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: background 0.15s;
+    width: calc(100% - 20px);
+  }
+
+  .sidebar-user:hover { background: var(--surface-subtle); }
+
+  .sidebar-footer-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 10px 14px;
+    width: calc(100% - 20px);
+  }
+
+  .sidebar-footer-row .sidebar-user {
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+    width: auto;
+  }
+
+  .logout-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .logout-btn:hover { background: var(--surface-subtle); color: var(--text); }
+
+  .signin-footer-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 20px);
+    margin: 8px 10px 14px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .signin-footer-btn:hover { background: var(--accent-hover); }
+
+  .user-avatar-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .user-details { display: flex; flex-direction: column; min-width: 0; }
+  .user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .user-plan { font-size: 11px; color: var(--text-muted); }
+
+  /* ── Chat / Hero ── */
   .chat-page { display: flex; flex-direction: column; height: 100vh; }
+
   .active-docs-bar {
-    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-    padding: 8px 16px; border-bottom: 1px solid var(--border);
-    background: var(--panel); font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    font-size: 12px;
   }
-  .active-docs-label { font-weight: 600; color: var(--text-muted); margin-right: 2px; }
+
+  .active-docs-label {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+
   .doc-chip {
-    padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border);
-    background: var(--bg); color: var(--text-muted); cursor: pointer; font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s;
   }
-  .doc-chip.checked { background: var(--accent-light); color: var(--text); border-color: var(--text); }
 
-  .chat-scroll { flex: 1; overflow-y: auto; padding: 16px; }
+  .doc-chip.checked {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
 
-  /* Hero */
+  .chat-scroll { flex: 1; overflow-y: auto; }
+
   .hero {
-    background: linear-gradient(160deg, var(--hero-from) 0%, var(--hero-to) 55%);
-    padding: 64px 40px 48px; display: flex; flex-direction: column; align-items: center; text-align: center;
     min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px 80px;
+    text-align: center;
   }
-  .hero-title { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; color: var(--text); margin-bottom: 10px; }
-  .hero-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+
+  .hero-greeting {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .hero-mark {
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .hero-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 36px;
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
   .hero-input-wrap {
-    width: 100%; max-width: 580px; background: #FFFFFF;
-    border: 1px solid var(--border); border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05); overflow: hidden;
+    width: 100%;
+    max-width: 640px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
   }
+
   .hero-input {
-    width: 100%; padding: 16px 18px; border: none; outline: none; resize: none;
-    font-size: 14px; font-family: inherit; background: transparent; color: var(--text); line-height: 1.5;
+    width: 100%;
+    padding: 20px 22px 8px;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 15px;
+    font-family: inherit;
+    background: transparent;
+    color: var(--text);
+    line-height: 1.55;
   }
-  .hero-input-footer {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 12px; border-top: 1px solid var(--border); gap: 8px;
+
+  .hero-input::placeholder { color: var(--text-muted); }
+
+  .hero-input-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px 14px;
+    gap: 12px;
   }
-  .hero-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-  .hero-pill {
-    padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);
-    background: var(--bg); color: var(--text-muted); font-size: 11px; cursor: pointer; font-family: inherit;
+
+  .hero-toolbar-left,
+  .hero-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .hero-pill:hover { border-color: var(--text); color: var(--text); }
+
+  .toolbar-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .toolbar-icon-btn:hover { background: var(--bg); color: var(--text); }
+
+  .toolbar-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-subtle);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .toolbar-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .model-select {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .model-select:hover { border-color: var(--accent); }
+
   .hero-send {
-    width: 32px; height: 32px; border-radius: 8px; border: none;
-    background: var(--text); color: var(--panel); display: flex; align-items: center;
-    justify-content: center; cursor: pointer; flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, opacity 0.15s;
   }
-  .hero-send:disabled { opacity: 0.3; cursor: default; }
-  .hero-send:not(:disabled):hover { opacity: 0.8; }
 
-  /* Messages */
-  .chat-messages { display: flex; flex-direction: column; gap: 18px; max-width: 720px; margin: 0 auto; }
-  .msg-row { display: flex; gap: 10px; align-items: flex-start; }
+  .hero-send:disabled { opacity: 0.35; cursor: default; }
+  .hero-send:not(:disabled):hover { background: var(--accent-hover); }
+
+  .hero-quick-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+    max-width: 640px;
+  }
+
+  .hero-quick-row.compact { margin-top: 0; margin-bottom: 10px; justify-content: flex-start; max-width: none; }
+
+  .hero-quick-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: all 0.15s;
+  }
+
+  .hero-quick-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .hero-quick-icon { font-size: 15px; line-height: 1; }
+
+  .hero-login-hint {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .hero-login-link {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .hero-login-link:hover { color: var(--accent-hover); }
+
+  /* ── Messages ── */
+  .chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    width: 100%;
+  }
+
+  .msg-row { display: flex; gap: 12px; align-items: flex-start; }
   .msg-row.user { flex-direction: row-reverse; }
+
   .avatar {
-    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
   }
-  .ai-avatar { background: var(--text); color: var(--panel); }
+
+  .ai-avatar { background: var(--accent); color: white; }
   .user-avatar { background: var(--border); color: var(--text); }
-  .bubble { padding: 10px 14px; border-radius: 12px; line-height: 1.6; font-size: 13px; max-width: 82%; }
-  .ai-bubble { background: #FFFFFF; border: 1px solid var(--border); border-radius: 4px 12px 12px 12px; }
-  .user-bubble { background: var(--text); color: var(--panel); border-radius: 12px 4px 12px 12px; }
 
-  /* Input bar */
-  .chat-input-bar { padding: 10px 16px 14px; border-top: 1px solid var(--border); background: var(--panel); }
-  .quick-actions { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
-  .quick-pill {
-    padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);
-    background: var(--bg); color: var(--text-muted); font-size: 11px; cursor: pointer; font-family: inherit;
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 16px;
+    line-height: 1.65;
+    font-size: 14px;
+    max-width: 78%;
   }
-  .quick-pill:hover { border-color: var(--text); color: var(--text); }
-  .chat-input-row { display: flex; gap: 8px; }
+
+  .ai-bubble {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px 16px 16px 16px;
+  }
+
+  .user-bubble {
+    background: var(--accent);
+    color: white;
+    border-radius: 16px 4px 16px 16px;
+  }
+
+  .chat-input-bar {
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+    max-width: 720px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .chat-input-row { display: flex; gap: 10px; align-items: center; }
+
   .chat-input {
-    flex: 1; height: 38px; border-radius: 9px; border: 1px solid var(--border);
-    background: #FFFFFF; color: var(--text); padding: 0 12px; font-size: 13px;
-    outline: none; font-family: inherit;
+    flex: 1;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    padding: 0 16px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
   }
-  .chat-input:focus { border-color: var(--text); }
-  .send-btn {
-    width: 38px; height: 38px; border-radius: 9px; border: none;
-    background: var(--text); color: var(--panel); display: flex; align-items: center; justify-content: center; cursor: pointer;
-  }
-  .send-btn:hover { opacity: 0.8; }
 
-  /* Placeholder */
+  .chat-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(55, 86, 171, 0.12); }
+
+  /* ── Placeholder & pages ── */
+  .placeholder-page,
+  .page-shell {
+    padding: 56px 48px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
   .placeholder-page {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    height: 100%; gap: 10px; color: var(--text-muted); text-align: center; padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    text-align: center;
+    gap: 12px;
   }
-  .placeholder-title { font-size: 16px; font-weight: 700; color: var(--text); }
-  .placeholder-sub { font-size: 13px; max-width: 300px; }
 
-  /* Cost */
-  .cost-page { padding: 40px; }
-  .page-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
-  .cost-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-  .cost-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px 16px; }
-  .cost-value { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-  .cost-label { font-size: 11px; color: var(--text-muted); }
+  .placeholder-icon { font-size: 48px; }
+  .placeholder-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 24px;
+    font-weight: 500;
+    font-style: italic;
+  }
+
+  .placeholder-sub { font-size: 14px; color: var(--text-muted); max-width: 320px; line-height: 1.6; }
+
+  .placeholder-cta {
+    margin-top: 12px;
+    padding: 10px 22px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .placeholder-cta:hover { background: var(--accent-hover); }
+
+  .page-title {
+    font-family: 'Lora', Georgia, serif;
+    font-size: 28px;
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 28px;
+    letter-spacing: -0.3px;
+  }
+
+  .cost-grid,
+  .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+  }
+
+  .stat-card,
+  .profile-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+  }
+
+  .stat-value { font-size: 26px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .stat-label { font-size: 12px; color: var(--text-muted); }
+
+  .profile-card { max-width: 520px; padding: 24px; }
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .profile-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .profile-info { flex: 1; min-width: 0; }
+  .profile-name { font-size: 18px; font-weight: 600; }
+  .profile-plan { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .profile-edit-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+
+  .profile-edit-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .profile-edit-form { display: flex; gap: 8px; align-items: center; }
+
+  .profile-name-input {
+    flex: 1;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 0 10px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+  }
+
+  .profile-name-input:focus { border-color: var(--accent); }
+
+  .profile-save-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .profile-stats { margin-top: 4px; }
+
+  .profile-login-btn {
+    margin-top: 16px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .profile-login-btn:hover { background: var(--accent-hover); }
+
+  /* ── Login page (full screen) ── */
+  .login-page {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    overflow: hidden;
+  }
+
+  .login-page-glow {
+    position: absolute;
+    top: -120px;
+    left: -80px;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(
+      circle at 30% 30%,
+      rgba(55, 86, 171, 0.22) 0%,
+      rgba(147, 197, 253, 0.15) 35%,
+      rgba(251, 207, 232, 0.12) 55%,
+      transparent 70%
+    );
+    pointer-events: none;
+    filter: blur(2px);
+  }
+
+  .login-page-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .login-page-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 40px;
+  }
+
+  .login-page-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #1C1A17;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .login-page-brand-name {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: #1C1A17;
+  }
+
+  .login-page-headline {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.6px;
+    color: #1C1A17;
+    margin-bottom: 36px;
+  }
+
+  .login-page-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .login-btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 52px;
+    border-radius: 14px;
+    border: none;
+    background: #1C1A17;
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+
+  .login-btn-google:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  .login-social-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .login-social-btn {
+    flex: 1;
+    height: 52px;
+    border-radius: 14px;
+    border: none;
+    background: #F3F4F6;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .login-social-btn:hover { background: #E5E7EB; }
+
+  .login-btn-email {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 52px;
+    border-radius: 14px;
+    border: none;
+    background: #F3F4F6;
+    color: #1C1A17;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .login-btn-email:hover { background: #E5E7EB; }
+
+  .login-page-email-panel {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 28px;
+  }
+
+  .login-back-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+
+  .login-back-btn:hover { color: var(--accent); }
+
+  .login-email-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .login-email-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .login-email-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .login-email-input {
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    background: #F9FAFB;
+    padding: 0 14px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .login-email-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(55, 86, 171, 0.12);
+    background: white;
+  }
+
+  .login-email-error {
+    font-size: 12px;
+    color: #B91C1C;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+
+  .login-btn-submit {
+    height: 48px;
+    margin-top: 4px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .login-btn-submit:hover { background: var(--accent-hover); }
+
+  .login-email-switch {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .login-email-switch-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .login-page-legal {
+    font-size: 12px;
+    color: #6B7280;
+    line-height: 1.5;
+    max-width: 320px;
+  }
+
+  .login-legal-link {
+    color: #374151;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .login-legal-link:hover { color: var(--accent); }
 `;
