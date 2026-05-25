@@ -158,3 +158,6 @@
 ### 25-05-2026 23:59
 - **Prompt**: can you run it for mr?
 
+### 26-05-2026 00:12
+- **Prompt**: why i cannot run http://localhost:8000/chat
+
