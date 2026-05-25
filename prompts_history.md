@@ -108,3 +108,6 @@
 ### 22-05-2026 12:16
 - **Prompt**: help me to push it
 
+### 25-05-2026 23:26
+- **Prompt**: Why im already upload API but the AI still said This is a mock response. Connect the backend to get real AI answers from your documents.
+
