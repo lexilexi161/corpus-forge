@@ -164,3 +164,6 @@
 ### 26-05-2026 00:20
 - **Prompt**: yes
 
+### 26-05-2026 00:22
+- **Prompt**: yes i already set the .env
+
