@@ -167,3 +167,6 @@
 ### 26-05-2026 00:22
 - **Prompt**: yes i already set the .env
 
+### 26-05-2026 00:23
+- **Prompt**: [Terminal 1a408ef4-fb82-4f7c-9e6e-c3248d23821d notification: command completed with exit code 1. Use send_to_terminal to send another command or kill_terminal to stop it.] Terminal output: /Users/admin/.zprofile:1: no such file or directory: /opt/homebrew/bin/brew /Users/admin/.zprofile:2: no such file or directory: /opt/homebrew/bin/brew  pkill -f 'uvicorn main:app --reload --port 8000' || true cd /Users/admin/Documents/EPITA/corpus-forge/corpus-forge/backend && ../.venv/bin/python -m uvicorn main:app --reload --port 8000 INFO:     Will watch for changes in these directories: ['/Users/admin/Documents/EPITA/corpus-forge/corpus-forge/backend'] /Users/admin/Documents/EPITA/corpus-forge/corpus-forge/backend/main.py:4: FutureWarning:   All support for the `google.generativeai` package has ended. It will no longer be receiving  updates or bug fixes. Please switch to the `google.genai` package as soon as possible. See README for more details:  https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md    import google.generativeai as genai ERROR:    [Errno 48] Address already in use
+
