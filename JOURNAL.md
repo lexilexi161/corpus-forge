@@ -917,3 +917,19 @@ uvicorn main:app --reload --port 8000
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 00:27
 - **Prompt**: yes
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 26-05-2026 00:27
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: yes
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Made the frontend chat API base URL configurable with `VITE_API_BASE_URL` and kept `http://localhost:8000` as the fallback.
+- **Context and Reasons for Changes**: This lets the frontend target a different backend host without changing source code.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 00:27
+- **Prompt**: are you sure that the server is running on port 8000 ?
