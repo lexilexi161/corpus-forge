@@ -152,3 +152,6 @@
 ### 25-05-2026 23:55
 - **Prompt**: why i can not run cd backend/databasecd backend/database cd: no such file or directory: backend/database
 
+### 25-05-2026 23:56
+- **Prompt**: i wanna run this command cd backend/database uvicorn main:app --reload --port 8000
+
