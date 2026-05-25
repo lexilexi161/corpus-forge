@@ -185,3 +185,6 @@
 ### 26-05-2026 00:27
 - **Prompt**: are you sure that the server is running on port 8000 ?
 
+### 26-05-2026 00:29
+- **Prompt**: but when i ask the chatbox said ⚠️ Could not reach the AI backend. Make sure the server is running on port 8000.
+
