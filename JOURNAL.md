@@ -1255,3 +1255,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 10:59
 - **Prompt**: Improve error handling in backend/routes/documents.py.  Current issue: chunk-save sqlite3.OperationalError can be silently ignored, so upload may return ok even if chunks were not saved.  Make the smallest safe fix: - Do not silently ignore chunk saving errors. - If chunk saving fails, return a clear JSON error or warning. - Keep the existing upload, parse, and chunk flow. - Do not change the database schema. - Do not modify frontend files.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 11:04
+- **Prompt**: Improve file upload safety in backend/routes/documents.py.  Use werkzeug.utils.secure_filename on uploaded file names before saving them.  Do not change the upload route behavior otherwise. Do not modify frontend files. Do not change the database schema.
