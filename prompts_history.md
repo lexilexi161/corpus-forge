@@ -211,3 +211,6 @@
 ### 26-05-2026 10:27
 - **Prompt**: Now connect the existing Gemini helper to the active Flask chat route.  Use the active Flask backend only. Do not use backend/main.py.  Scope: - Edit backend/routes/chat.py only, unless a tiny import fix is needed. - Keep the existing retrieval logic exactly as much as possible. - Import generate_answer from backend/rag/gemini_client.py. - After retrieved_chunks = retrieve_relevant_chunks(...), call generate_answer(query, retrieved_chunks). - The chat route should accept:   - message or question   - optional audience_level   - optional tone   - optional output_format - Return JSON containing:   - status   - question   - answer   - retrieved_chunks   - chunk_count   - source: "gemini"  If GEMINI_API_KEY is missing or Gemini fails, return a clear JSON error without crashing Flask.  Do not modify frontend files. Do not rewrite the backend. Do not change the database schema. Do not touch upload/parsing/chunking logic.
 
+### 26-05-2026 10:30
+- **Prompt**: Update backend/config.py to include GEMINI_API_KEY from the environment for consistency.  Keep the existing GOOGLE_API_KEY line if it is already there, but add:  GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")  Do not hardcode any API key. Do not modify other files.
+
