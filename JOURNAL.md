@@ -1205,6 +1205,23 @@ Do not change code unless the test reveals a real bug.
 - **Context and Reasons for Changes**: The live route path works through retrieval, but a real Gemini answer could not be verified without setting the API key in the running PowerShell session.
 
 ### **New Interaction**
+- **Agent Version**: 2.3
+- **Date**: 26-05-2026 10:43
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: Improve the Gemini chat behavior for the no-context case.
+
+If retrieved_chunks is empty, do not call Gemini. Instead, return a JSON response saying the uploaded documents do not contain enough information to answer the question.
+
+Keep the existing Gemini integration and retrieval logic unchanged otherwise.
+Do not modify frontend files.
+Do not change the database schema.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Added a no-context guard in backend/routes/chat.py so the route returns the grounded insufficient-information JSON response without calling Gemini when retrieval returns no chunks.
+- **Context and Reasons for Changes**: This prevents unnecessary Gemini calls when there is no retrieved context while keeping the rest of the chat and retrieval flow unchanged.
+
+### **New Interaction**
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 10:37
 - **Prompt**: Help me manually test the Gemini-connected chat route on Windows PowerShell.  Show me the exact commands to: 1. set GEMINI_API_KEY temporarily 2. run the Flask backend 3. upload a small sample txt file to the document upload route 4. send a chat question to /chat 5. confirm that the JSON response contains an answer from Gemini, retrieved_chunks, chunk_count, and source: "gemini"  Do not change code unless the test reveals a real bug.

@@ -1,9 +1,9 @@
-
 import sqlite3
 
 from flask import Blueprint, jsonify, request
 
 from models.db import get_connection
+from rag.gemini_client import generate_answer
 from rag import retrieve_relevant_chunks
 
 chat_bp = Blueprint("chat", __name__)
@@ -41,6 +41,9 @@ def load_saved_chunks():
 def send_message():
     data = request.get_json(silent=True) or {}
     query = data.get("message") or data.get("question")
+    audience_level = data.get("audience_level", "beginner")
+    tone = data.get("tone", "simple")
+    output_format = data.get("output_format", "paragraph")
 
     if not query:
         return jsonify({"status": "error", "message": "Missing message"}), 400
@@ -48,11 +51,81 @@ def send_message():
     chunks = load_saved_chunks()
     retrieved_chunks = retrieve_relevant_chunks(query, chunks, top_k=5)
 
+    if not retrieved_chunks:
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "The uploaded documents do not contain enough information to answer this question.",
+                    "question": query,
+                    "retrieved_chunks": retrieved_chunks,
+                    "chunk_count": 0,
+                    "source": "gemini",
+                }
+            ),
+            200,
+        )
+
+    answer = generate_answer(
+        query,
+        retrieved_chunks,
+        audience_level=audience_level,
+        tone=tone,
+        output_format=output_format,
+    )
+
+    if answer.startswith("GEMINI_API_KEY is not set."):
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": answer,
+                    "question": query,
+                    "retrieved_chunks": retrieved_chunks,
+                    "chunk_count": len(retrieved_chunks),
+                    "source": "gemini",
+                }
+            ),
+            503,
+        )
+
+    if answer.startswith("Gemini support is not installed yet."):
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": answer,
+                    "question": query,
+                    "retrieved_chunks": retrieved_chunks,
+                    "chunk_count": len(retrieved_chunks),
+                    "source": "gemini",
+                }
+            ),
+            503,
+        )
+
+    if answer.startswith("Gemini is temporarily unavailable."):
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": answer,
+                    "question": query,
+                    "retrieved_chunks": retrieved_chunks,
+                    "chunk_count": len(retrieved_chunks),
+                    "source": "gemini",
+                }
+            ),
+            502,
+        )
+
     return jsonify(
         {
+            "status": "ok",
             "question": query,
+            "answer": answer,
             "retrieved_chunks": retrieved_chunks,
             "chunk_count": len(retrieved_chunks),
-            "message": "Gemini is not connected yet.",
+            "source": "gemini",
         }
     )
