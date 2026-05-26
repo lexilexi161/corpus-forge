@@ -220,3 +220,6 @@
 ### 26-05-2026 10:39
 - **Prompt**: can u run this and check it works?
 
+### 26-05-2026 10:42
+- **Prompt**: Improve the Gemini chat behavior for the no-context case.  If retrieved_chunks is empty, do not call Gemini. Instead, return a JSON response saying the uploaded documents do not contain enough information to answer the question.  Keep the existing Gemini integration and retrieval logic unchanged otherwise. Do not modify frontend files. Do not change the database schema.
+
