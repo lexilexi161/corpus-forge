@@ -1167,3 +1167,13 @@ Only edit JOURNAL.md.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 10:30
 - **Prompt**: Update backend/config.py to include GEMINI_API_KEY from the environment for consistency.  Keep the existing GOOGLE_API_KEY line if it is already there, but add:  GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")  Do not hardcode any API key. Do not modify other files.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Added GEMINI_API_KEY to backend/config.py while preserving the existing GOOGLE_API_KEY lookup.
+- **Context and Reasons for Changes**: This keeps the config module aligned with the Gemini helper and the active Flask chat route without changing any other files.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 10:37
+- **Prompt**: Help me manually test the Gemini-connected chat route on Windows PowerShell.  Show me the exact commands to: 1. set GEMINI_API_KEY temporarily 2. run the Flask backend 3. upload a small sample txt file to the document upload route 4. send a chat question to /chat 5. confirm that the JSON response contains an answer from Gemini, retrieved_chunks, chunk_count, and source: "gemini"  Do not change code unless the test reveals a real bug.
