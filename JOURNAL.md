@@ -1055,3 +1055,44 @@ uvicorn main:app --reload --port 8000
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 10:09
 - **Prompt**: I want to add Gemini answer generation to our Corpus Forge project, but first I want you to inspect the current codebase before editing anything.  Please read and inspect these files: - backend/app.py - backend/routes/chat.py - backend/routes/documents.py - backend/rag/retriever.py - backend/rag/parser.py - backend/rag/chunker.py - backend/config.py - backend/main.py - requirements.txt - README.md - backend/database/schema.sql and any files related  Do not modify any file yet.  Explain in simple terms: 1. which backend is actually active: Flask app.py or FastAPI main.py 2. how the current upload â†’ parse â†’ chunk flow works 3. how the current chat â†’ retrieval flow works 4. where Gemini should be added 5. whether Gemini should be placed directly in chat.py or in a separate gemini_client.py file 6. which API key name we should use based on the current project 7. which Gemini package should be added to requirements.txt 8. the smallest safe implementation plan
+
+### **New Interaction**
+- **Agent Version**: 2.3
+- **Date**: 26-05-2026 10:11
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: I want to add Gemini answer generation to our Corpus Forge project, but first I want you to inspect the current codebase before editing anything.
+
+Please read and inspect these files:
+- backend/app.py
+- backend/routes/chat.py
+- backend/routes/documents.py
+- backend/rag/retriever.py
+- backend/rag/parser.py
+- backend/rag/chunker.py
+- backend/config.py
+- backend/main.py
+- requirements.txt
+- README.md
+- backend/database/schema.sql and any files related
+
+Do not modify any file yet.
+
+Explain in simple terms:
+1. which backend is actually active: Flask app.py or FastAPI main.py
+2. how the current upload → parse → chunk flow works
+3. how the current chat → retrieval flow works
+4. where Gemini should be added
+5. whether Gemini should be placed directly in chat.py or in a separate gemini_client.py file
+6. which API key name we should use based on the current project
+7. which Gemini package should be added to requirements.txt
+8. the smallest safe implementation plan
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes; inspected the Flask and FastAPI entrypoints, upload/chunk and retrieval flow, Gemini helper, requirements, README, and schema to map the safest integration point.
+- **Context and Reasons for Changes**: The user asked for a codebase inspection before edits so the Gemini integration plan could be grounded in the current architecture.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 10:17
+- **Prompt**: Based on the inspection, implement the smallest safe Gemini integration.  Use the active Flask backend only. Do not use backend/main.py.  Use the existing backend/rag/gemini_client.py if it already exists. If it is incomplete, update it.  Requirements: - Use google-genai with: from google import genai - Use GEMINI_API_KEY from the environment - Do not hardcode any API key - Keep Gemini logic inside backend/rag/gemini_client.py - Expose generate_answer(question, retrieved_chunks, audience_level="beginner", tone="simple", output_format="paragraph") - Build a grounded prompt from the retrieved chunk texts and the user question - Include audience_level, tone, and output_format in the prompt - Tell Gemini to answer only using the retrieved context when possible - If the context is insufficient, say the uploaded documents do not contain enough information - Handle missing GEMINI_API_KEY clearly - Handle Gemini errors without crashing Flask  Do not modify chat.py yet. Do not modify frontend files. Do not change the database schema.
