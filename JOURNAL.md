@@ -1339,3 +1339,20 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 14:13
 - **Prompt**: Create a small frontend API helper file for the Flask backend.  Create: frontend/src/api.ts  Use: const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:5000";  Add these functions: - uploadDocument(file: File) - sendChatMessage(message: string, options?: { audience_level?: string; tone?: string; output_format?: string }) - generateFlashcards(topic: string, options?: { count?: number; audience_level?: string; tone?: string }) - generateQuiz(topic: string, options?: { count?: number; audience_level?: string; tone?: string })  Endpoints: - POST /documents with FormData - POST /chat with JSON - POST /artifacts/flashcards with JSON - POST /artifacts/quiz with JSON  Requirements: - Use fetch() - Throw a clear Error if the backend returns an error response - Do not put any Gemini API key in the frontend - Do not modify App.tsx yet - Do not modify backend files - Keep it simple and TypeScript-friendly
+
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 26-05-2026 14:14
+- **User**: not provided
+- **Prompt**: Create a small frontend API helper file for the Flask backend. Create frontend/src/api.ts. Use API_BASE_URL from import.meta.env.VITE_API_BASE_URL or http://127.0.0.1:5000. Add uploadDocument, sendChatMessage, generateFlashcards, and generateQuiz using fetch. Throw clear Errors for backend failures. Do not put any Gemini API key in the frontend. Do not modify App.tsx yet. Do not modify backend files. Keep it simple and TypeScript-friendly.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Added `frontend/src/api.ts` with fetch-based helpers for document upload, chat, flashcards, and quiz endpoints, plus shared error parsing for backend responses.
+- **Context and Reasons for Changes**: The frontend needed a small backend wrapper before the UI can be wired to Flask, and isolating the API calls keeps Chloé’s UI structure unchanged.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 14:16
+- **Prompt**: Now connect the existing Add document button in frontend/src/App.tsx to the backend upload route.  Use uploadDocument() from frontend/src/api.ts.  Scope: - Edit App.tsx only. - Do not redesign the UI. - Keep the existing sidebar/document section structure. - Add a hidden file input if needed. - When the user clicks + Add document, open the file picker. - When a file is selected, upload it to the backend. - On success, add the uploaded document to the existing docs state. - Show basic upload status or error if possible. - Use the backend response fields like filename, chunk_count, and extracted_text_length if available. - Do not modify chat, flashcards, or quiz yet. - Do not modify backend files.
