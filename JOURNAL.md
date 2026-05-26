@@ -1240,3 +1240,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 10:51
 - **Prompt**: Fix the unresolved merge conflict markers in prompts_history.md.  Keep both sides of the prompt history because they contain valid teammate logs. Remove only the conflict marker lines: <<<<<<< HEAD ======= >>>>>>>  Do not delete valid prompt entries. Only edit prompts_history.md. After editing, search the file to make sure no real conflict markers remain.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 10:54
+- **Prompt**: Improve the retrieval/chat behavior so unrelated questions do not send zero-score chunks to Gemini.  Current issue: retrieve_relevant_chunks can return chunks even when all scores are 0.  Make the smallest safe fix: - Either update retrieve_relevant_chunks() to return only chunks with score > 0 - Or update chat.py to treat retrieved chunks with score 0 as no useful context  Preferred behavior: If no relevant chunks are found, /chat should return a JSON response saying the uploaded documents do not contain enough information to answer the question. Do not call Gemini in that case.  Do not modify frontend files. Do not change the database schema. Keep the implementation simple and easy to explain.
