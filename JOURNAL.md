@@ -780,6 +780,18 @@ quote> i dont think it work
 
 ### **New Interaction**
 
+- **Agent Version**: 2.3
+- **Date**: 26-05-2026 12:00
+- **User**: not provided
+- **Prompt**: Now add persistence for generated flashcards and quizzes. Use the existing artifacts table in backend/database/schema.sql. Do not change the schema. When flashcards or quiz content is generated, save the generated content to a file in backend/generated_artifacts/ and insert one row into the artifacts table with artifact_name, artifact_date, artifact_size, artifact_type, artifact_path, artifact_prompt, document_id null, and corpus_id null. Return the artifact metadata in the JSON response. Do not modify frontend files. Keep error handling clear.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Added artifact persistence to `backend/routes/artifacts.py` so generated flashcards and quizzes are written to `backend/generated_artifacts/` and recorded in the existing `artifacts` table, with clear errors if saving fails.
+- **Context and Reasons for Changes**: The new artifact routes needed durable storage before the frontend integration work, and the schema already had an `artifacts` table suitable for this metadata.
+
+### **New Interaction**
+
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 17:45
 - **Prompt**: why i cannot run npm run dev
@@ -1297,3 +1309,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 13:42
 - **Prompt**: Now add persistence for generated flashcards and quizzes.  Use the existing artifacts table in backend/database/schema.sql. Do not change the schema.  When flashcards or quiz content is generated: 1. Save the generated content to a file in a safe local folder, for example backend/generated_artifacts/ 2. Insert one row into the artifacts table with:    - artifact_name    - artifact_date    - artifact_size    - artifact_type    - artifact_path    - artifact_prompt    - document_id as null for now if no specific document was selected    - corpus_id as null for now if no corpus was selected  Return the artifact metadata in the JSON response.  Do not modify frontend files. Keep error handling clear.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 13:44
+- **Prompt**: Register the new artifacts blueprint in backend/app.py.  Import artifacts_bp from routes.artifacts and register it with the Flask app.  Do not modify other route logic. Do not modify frontend files.
