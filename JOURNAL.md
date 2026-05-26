@@ -1267,3 +1267,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 11:51
 - **Prompt**: AIzaSyCKd6xDGrAxwVBJlGHMv-tO1wsTwZ6kPRA this is the api key?
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 11:52
+- **Prompt**: i dont know where to paste it so you paste it

@@ -243,3 +243,6 @@
 ### 26-05-2026 11:51
 - **Prompt**: AIzaSyCKd6xDGrAxwVBJlGHMv-tO1wsTwZ6kPRA this is the api key?
 
+### 26-05-2026 11:52
+- **Prompt**: i dont know where to paste it so you paste it
+
