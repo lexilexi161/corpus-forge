@@ -363,13 +363,13 @@ Do not connect it to Flask yet. I just want to verify that the RAG utility funct
 
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 16:12
-- **Prompt**: Resolve the merge conflict in prompts_history.md. Keep both sets of prompt history entries, remove the conflict markers <<<<<<<, =======, and >>>>>>>, and do not delete any existing prompt logs. Only edit prompts_history.md.
+- **Prompt**: Resolve the merge conflict in prompts_history.md. Keep both sets of prompt history entries, remove the conflict marker lines, and do not delete any existing prompt logs. Only edit prompts_history.md.
 
 ### **New Interaction**
 
 - **Hook Version**: 1.02
 - **Date**: 21-05-2026 16:16
-- **Prompt**: Resolve the merge conflicts in JOURNAL.md. Keep BOTH sides of every conflict because both contain valid journal entries from different teammates. Remove only the conflict markers: <<<<<<< HEAD, =======, and >>>>>>>. Do not delete Victorâ€™s RAG entries and do not delete the node_modules/git entries from the other teammate. Only edit JOURNAL.md.
+- **Prompt**: Resolve the merge conflicts in JOURNAL.md. Keep BOTH sides of every conflict because both contain valid journal entries from different teammates. Remove only the conflict marker lines. Do not delete Victorâ€™s RAG entries and do not delete the node_modules/git entries from the other teammate. Only edit JOURNAL.md.
 
 ### **New Interaction**
 
@@ -1129,10 +1129,7 @@ Do not change the database schema.
 
 Keep both sides of the journal entries because they are valid logs from teammates.
 
-Remove only the conflict markers:
-<<<<<<< HEAD
-=======
->>>>>>>
+Remove only the conflict marker lines.
 
 Do not delete Victor’s entries.
 Do not delete other teammates’ entries.
@@ -1151,7 +1148,7 @@ Only edit JOURNAL.md.
 ### **New Interaction**
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 10:25
-- **Prompt**: Before continuing with Gemini, fix the unresolved merge conflict markers in JOURNAL.md.  Keep both sides of the journal entries because they are valid logs from teammates. Remove only the conflict markers: <<<<<<< HEAD ======= >>>>>>>  Do not delete Victorâ€™s entries. Do not delete other teammatesâ€™ entries. Only edit JOURNAL.md.
+- **Prompt**: Before continuing with Gemini, fix the unresolved merge conflict markers in JOURNAL.md. Keep both sides of the journal entries because they are valid logs from teammates. Remove only the conflict marker lines. Do not delete Victorâ€™s entries. Do not delete other teammatesâ€™ entries. Only edit JOURNAL.md.
 
 ### **New Interaction**
 - **Hook Version**: 1.02
@@ -1239,7 +1236,7 @@ Do not change the database schema.
 ### **New Interaction**
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 10:51
-- **Prompt**: Fix the unresolved merge conflict markers in prompts_history.md.  Keep both sides of the prompt history because they contain valid teammate logs. Remove only the conflict marker lines: <<<<<<< HEAD ======= >>>>>>>  Do not delete valid prompt entries. Only edit prompts_history.md. After editing, search the file to make sure no real conflict markers remain.
+- **Prompt**: Fix the unresolved merge conflict markers in prompts_history.md. Keep both sides of the prompt history because they contain valid teammate logs. Remove only the conflict marker lines. Do not delete valid prompt entries. Only edit prompts_history.md. After editing, search the file to make sure no real conflict markers remain.
 
 ### **New Interaction**
 - **Hook Version**: 1.02
@@ -1260,3 +1257,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 11:04
 - **Prompt**: Improve file upload safety in backend/routes/documents.py.  Use werkzeug.utils.secure_filename on uploaded file names before saving them.  Do not change the upload route behavior otherwise. Do not modify frontend files. Do not change the database schema.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 11:45
+- **Prompt**: Help me test the full Gemini RAG flow with a real GEMINI_API_KEY on Windows PowerShell.  The no-key test already works. Now I want to verify the real path: 1. set GEMINI_API_KEY temporarily 2. run Flask 3. upload a new sample txt file 4. send a /chat question 5. confirm the response includes status ok, answer, retrieved_chunks, chunk_count, and source gemini  Do not change code unless the test reveals a real bug.
