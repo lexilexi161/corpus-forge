@@ -223,3 +223,6 @@
 ### 26-05-2026 10:42
 - **Prompt**: Improve the Gemini chat behavior for the no-context case.  If retrieved_chunks is empty, do not call Gemini. Instead, return a JSON response saying the uploaded documents do not contain enough information to answer the question.  Keep the existing Gemini integration and retrieval logic unchanged otherwise. Do not modify frontend files. Do not change the database schema.
 
+### 26-05-2026 10:51
+- **Prompt**: Fix the unresolved merge conflict markers in prompts_history.md.  Keep both sides of the prompt history because they contain valid teammate logs. Remove only the conflict marker lines: <<<<<<< HEAD ======= >>>>>>>  Do not delete valid prompt entries. Only edit prompts_history.md. After editing, search the file to make sure no real conflict markers remain.
+
