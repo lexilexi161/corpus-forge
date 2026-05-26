@@ -1245,3 +1245,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 10:54
 - **Prompt**: Improve the retrieval/chat behavior so unrelated questions do not send zero-score chunks to Gemini.  Current issue: retrieve_relevant_chunks can return chunks even when all scores are 0.  Make the smallest safe fix: - Either update retrieve_relevant_chunks() to return only chunks with score > 0 - Or update chat.py to treat retrieved chunks with score 0 as no useful context  Preferred behavior: If no relevant chunks are found, /chat should return a JSON response saying the uploaded documents do not contain enough information to answer the question. Do not call Gemini in that case.  Do not modify frontend files. Do not change the database schema. Keep the implementation simple and easy to explain.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 10:57
+- **Prompt**: Update the document upload JSON response to include extracted_text_length.  After parse_document() extracts text, include the length of the extracted text in the response.  Do not change the upload flow. Do not modify frontend files. Do not change the database schema.
