@@ -1278,7 +1278,7 @@ Do not change the database schema.
 ### **New Interaction**
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 11:51
-- **Prompt**: AIzaSyCKd6xDGrAxwVBJlGHMv-tO1wsTwZ6kPRA this is the api key?
+- **Prompt**: [REDACTED] this is the api key?
 
 ### **New Interaction**
 - **Hook Version**: 1.02
@@ -1319,3 +1319,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 13:54
 - **Prompt**: A real API key appears in JOURNAL.md and prompts_history.md.  Replace the real key everywhere with [REDACTED]. Do not delete the surrounding journal/prompt entries. Do not add any new API key. Only edit JOURNAL.md and prompts_history.md.  After editing, search the repo for: AIza GEMINI_API_KEY= GOOGLE_API_KEY=  Make sure no real key remains committed.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 13:56
+- **Prompt**: Fix the no-context response bug in backend/routes/artifacts.py.  Current problem: _handle_no_context_response() builds a message but does not return a valid Flask JSON response, causing /artifacts/flashcards and /artifacts/quiz to return 500 for unrelated topics.  Make the smallest safe fix: - _handle_no_context_response(topic, artifact_type) should return jsonify(...) with a useful response. - It should not call Gemini. - It should return a clear message saying the uploaded documents do not contain enough information. - It should include status, artifact_type, topic, content/message, retrieved_chunks as empty list, chunk_count as 0, and source. - Do not modify frontend files. - Do not change the database schema.

@@ -241,7 +241,7 @@
 - **Prompt**: Help me test the full Gemini RAG flow with a real GEMINI_API_KEY on Windows PowerShell.  The no-key test already works. Now I want to verify the real path: 1. set GEMINI_API_KEY temporarily 2. run Flask 3. upload a new sample txt file 4. send a /chat question 5. confirm the response includes status ok, answer, retrieved_chunks, chunk_count, and source gemini  Do not change code unless the test reveals a real bug.
 
 ### 26-05-2026 11:51
-- **Prompt**: AIzaSyCKd6xDGrAxwVBJlGHMv-tO1wsTwZ6kPRA this is the api key?
+- **Prompt**: [REDACTED] this is the api key?
 
 ### 26-05-2026 11:52
 - **Prompt**: i dont know where to paste it so you paste it
@@ -266,4 +266,7 @@
 
 ### 26-05-2026 13:54
 - **Prompt**: A real API key appears in JOURNAL.md and prompts_history.md.  Replace the real key everywhere with [REDACTED]. Do not delete the surrounding journal/prompt entries. Do not add any new API key. Only edit JOURNAL.md and prompts_history.md.  After editing, search the repo for: AIza GEMINI_API_KEY= GOOGLE_API_KEY=  Make sure no real key remains committed.
+
+### 26-05-2026 13:56
+- **Prompt**: Fix the no-context response bug in backend/routes/artifacts.py.  Current problem: _handle_no_context_response() builds a message but does not return a valid Flask JSON response, causing /artifacts/flashcards and /artifacts/quiz to return 500 for unrelated topics.  Make the smallest safe fix: - _handle_no_context_response(topic, artifact_type) should return jsonify(...) with a useful response. - It should not call Gemini. - It should return a clear message saying the uploaded documents do not contain enough information. - It should include status, artifact_type, topic, content/message, retrieved_chunks as empty list, chunk_count as 0, and source. - Do not modify frontend files. - Do not change the database schema.
 
