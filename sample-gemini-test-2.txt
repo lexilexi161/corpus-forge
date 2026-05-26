@@ -1,0 +1,2 @@
+Corpus Forge stores document chunks and uses Gemini to answer questions.
+This sample is only about the Gemini RAG path.

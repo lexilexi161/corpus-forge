@@ -60,8 +60,13 @@ def retrieve_relevant_chunks(query, chunks, top_k=5):
 
     scored_chunks.sort(key=lambda item: (-item[0], item[1]))
 
+    # Only return chunks that have a positive score. This avoids
+    # sending unrelated (zero-score) chunks to the model.
     top_chunks = []
     for score, _, _, chunk, chunk_text in scored_chunks[:top_k]:
+        if score <= 0:
+            continue
+
         if isinstance(chunk, dict):
             chunk_result = dict(chunk)
             chunk_result["score"] = score

@@ -9,6 +9,9 @@ from __future__ import annotations
 import os
 
 DEFAULT_MODEL = "gemini-2.0-flash"
+NO_CONTEXT_MESSAGE = (
+    "The uploaded documents do not contain enough information to answer this question."
+)
 
 
 def _format_retrieved_chunks(retrieved_chunks):
@@ -53,28 +56,59 @@ def _build_prompt(question, retrieved_chunks, audience_level, tone, output_forma
     )
 
 
-def generate_answer(
-    question,
-    retrieved_chunks,
-    audience_level="beginner",
-    tone="simple",
-    output_format="paragraph",
-):
-    """Generate a grounded answer from Gemini using retrieved chunks.
+def _build_flashcard_prompt(topic, retrieved_chunks, count, audience_level, tone):
+    """Build a grounded prompt for flashcard generation."""
+    context_block = _format_retrieved_chunks(retrieved_chunks)
 
-    Returns a string. If Gemini cannot answer, a clear message is returned
-    instead of crashing the backend.
-    """
+    return (
+        "Create flashcards from the uploaded document context only when possible.\n\n"
+        f"Topic: {topic}\n"
+        f"Audience level: {audience_level}\n"
+        f"Tone: {tone}\n"
+        f"Number of flashcards: {count}\n\n"
+        "Rules:\n"
+        "- Use only the retrieved context when it is enough.\n"
+        f"- If the context does not contain enough information, say: {NO_CONTEXT_MESSAGE}\n"
+        "- Do not invent facts that are not in the retrieved context.\n"
+        "- Return valid JSON only.\n"
+        '- Use this shape exactly: {"topic": "...", "flashcards": [{"question": "...", "answer": "..."}]}\n'
+        "- Make the questions short and beginner-friendly.\n"
+        "- Make the answers concise and clear.\n\n"
+        f"Retrieved context:\n{context_block}"
+    )
+
+
+def _build_quiz_prompt(topic, retrieved_chunks, count, audience_level, tone):
+    """Build a grounded prompt for quiz generation."""
+    context_block = _format_retrieved_chunks(retrieved_chunks)
+
+    return (
+        "Create a quiz from the uploaded document context only when possible.\n\n"
+        f"Topic: {topic}\n"
+        f"Audience level: {audience_level}\n"
+        f"Tone: {tone}\n"
+        f"Number of questions: {count}\n\n"
+        "Rules:\n"
+        "- Use only the retrieved context when it is enough.\n"
+        f"- If the context does not contain enough information, say: {NO_CONTEXT_MESSAGE}\n"
+        "- Do not invent facts that are not in the retrieved context.\n"
+        "- Return valid JSON only.\n"
+        '- Use this shape exactly: {"topic": "...", "questions": [{"question": "...", "options": ["A", "B", "C", "D"], "correct_answer": "A", "explanation": "..."}]}\n'
+        "- Each question should have 4 options.\n"
+        "- Exactly one option should be correct.\n"
+        "- Keep the quiz beginner-friendly and easy to explain.\n\n"
+        f"Retrieved context:\n{context_block}"
+    )
+
+
+def _generate_with_prompt(prompt):
+    """Call Gemini with a prepared prompt and return text or a safe error."""
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         return (
             "GEMINI_API_KEY is not set. Set it in your environment before calling "
-            "generate_answer()."
+            "Gemini generation helpers."
         )
-
-    prompt = _build_prompt(
-        str(question), retrieved_chunks, audience_level, tone, output_format
-    )
 
     try:
         from google import genai  # pyright: ignore[reportMissingImports]
@@ -88,7 +122,7 @@ def generate_answer(
         if answer_text:
             return answer_text
 
-        return "The uploaded documents do not contain enough information to answer this question."
+        return NO_CONTEXT_MESSAGE
     except ImportError:
         return "Gemini support is not installed yet. Install the google-genai package to enable answers."
     except Exception as exc:
@@ -96,6 +130,63 @@ def generate_answer(
         if "RESOURCE_EXHAUSTED" in error_text or "quota" in error_text.lower():
             return (
                 "Gemini quota has been exceeded for this API key or project. "
-                "The uploaded documents do not contain enough information to answer this question right now."
+                f"{NO_CONTEXT_MESSAGE}"
             )
-        return "Gemini is temporarily unavailable. The uploaded documents do not contain enough information to answer this question right now."
+        return "Gemini is temporarily unavailable. " f"{NO_CONTEXT_MESSAGE}"
+
+
+def generate_answer(
+    question,
+    retrieved_chunks,
+    audience_level="beginner",
+    tone="simple",
+    output_format="paragraph",
+):
+    """Generate a grounded answer from Gemini using retrieved chunks.
+
+    Returns a string. If Gemini cannot answer, a clear message is returned
+    instead of crashing the backend.
+    """
+    prompt = _build_prompt(
+        str(question), retrieved_chunks, audience_level, tone, output_format
+    )
+    answer_text = _generate_with_prompt(prompt)
+    if answer_text == NO_CONTEXT_MESSAGE:
+        return "The uploaded documents do not contain enough information to answer this question."
+    return answer_text
+
+
+def generate_flashcards(
+    topic,
+    retrieved_chunks,
+    count=10,
+    audience_level="beginner",
+    tone="simple",
+):
+    """Generate beginner-friendly flashcards grounded in retrieved chunks."""
+    if not retrieved_chunks:
+        return NO_CONTEXT_MESSAGE
+
+    safe_count = max(1, int(count))
+    prompt = _build_flashcard_prompt(
+        str(topic), retrieved_chunks, safe_count, audience_level, tone
+    )
+    return _generate_with_prompt(prompt)
+
+
+def generate_quiz(
+    topic,
+    retrieved_chunks,
+    count=5,
+    audience_level="beginner",
+    tone="simple",
+):
+    """Generate a beginner-friendly quiz grounded in retrieved chunks."""
+    if not retrieved_chunks:
+        return NO_CONTEXT_MESSAGE
+
+    safe_count = max(1, int(count))
+    prompt = _build_quiz_prompt(
+        str(topic), retrieved_chunks, safe_count, audience_level, tone
+    )
+    return _generate_with_prompt(prompt)
