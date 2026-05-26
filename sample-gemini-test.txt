@@ -1,0 +1,3 @@
+﻿Corpus Forge test document.
+Paris is the capital of France.
+Gemini should answer from this context.
