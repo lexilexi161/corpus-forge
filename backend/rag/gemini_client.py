@@ -91,5 +91,11 @@ def generate_answer(
         return "The uploaded documents do not contain enough information to answer this question."
     except ImportError:
         return "Gemini support is not installed yet. Install the google-genai package to enable answers."
-    except Exception:
+    except Exception as exc:
+        error_text = str(exc)
+        if "RESOURCE_EXHAUSTED" in error_text or "quota" in error_text.lower():
+            return (
+                "Gemini quota has been exceeded for this API key or project. "
+                "The uploaded documents do not contain enough information to answer this question right now."
+            )
         return "Gemini is temporarily unavailable. The uploaded documents do not contain enough information to answer this question right now."
