@@ -1356,3 +1356,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 14:16
 - **Prompt**: Now connect the existing Add document button in frontend/src/App.tsx to the backend upload route.  Use uploadDocument() from frontend/src/api.ts.  Scope: - Edit App.tsx only. - Do not redesign the UI. - Keep the existing sidebar/document section structure. - Add a hidden file input if needed. - When the user clicks + Add document, open the file picker. - When a file is selected, upload it to the backend. - On success, add the uploaded document to the existing docs state. - Show basic upload status or error if possible. - Use the backend response fields like filename, chunk_count, and extracted_text_length if available. - Do not modify chat, flashcards, or quiz yet. - Do not modify backend files.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 14:19
+- **Prompt**: guide me on how i can manually test this upload
