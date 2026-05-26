@@ -231,3 +231,6 @@
 ### 26-05-2026 10:57
 - **Prompt**: Update the document upload JSON response to include extracted_text_length.  After parse_document() extracts text, include the length of the extracted text in the response.  Do not change the upload flow. Do not modify frontend files. Do not change the database schema.
 
+### 26-05-2026 10:59
+- **Prompt**: Improve error handling in backend/routes/documents.py.  Current issue: chunk-save sqlite3.OperationalError can be silently ignored, so upload may return ok even if chunks were not saved.  Make the smallest safe fix: - Do not silently ignore chunk saving errors. - If chunk saving fails, return a clear JSON error or warning. - Keep the existing upload, parse, and chunk flow. - Do not change the database schema. - Do not modify frontend files.
+
