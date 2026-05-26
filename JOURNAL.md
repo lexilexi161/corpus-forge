@@ -1329,3 +1329,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 13:59
 - **Prompt**: Fix the no-context response bug in backend/routes/artifacts.py.  Current problem: _handle_no_context_response() builds a message but does not return a valid Flask JSON response, causing /artifacts/flashcards and /artifacts/quiz to return 500 for unrelated topics.  Make the smallest safe fix: - _handle_no_context_response(topic, artifact_type) should return jsonify(...) with a useful response. - It should not call Gemini. - It should return a clear message saying the uploaded documents do not contain enough information. - It should include status, artifact_type, topic, content/message, retrieved_chunks as empty list, chunk_count as 0, and source. - Do not modify frontend files. - Do not change the database schema.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 14:09
+- **Prompt**: I want to connect the existing React frontend to the Flask backend, but do not modify anything yet.  Please inspect: - frontend/src/App.tsx - frontend/package.json - any frontend API/helper files if they exist - backend/app.py - backend/routes/documents.py - backend/routes/chat.py - backend/routes/artifacts.py  Do not edit files yet.  Explain: 1. where the frontend currently handles upload, chat, flashcards, and quiz UI 2. whether the frontend currently calls the backend or is still using mock data 3. the exact backend endpoints available 4. the smallest safe frontend integration plan 5. which frontend file(s) should be edited first 6. how to avoid rewriting ChloÃ©â€™s UI
