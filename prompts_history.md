@@ -217,3 +217,6 @@
 ### 26-05-2026 10:37
 - **Prompt**: Help me manually test the Gemini-connected chat route on Windows PowerShell.  Show me the exact commands to: 1. set GEMINI_API_KEY temporarily 2. run the Flask backend 3. upload a small sample txt file to the document upload route 4. send a chat question to /chat 5. confirm that the JSON response contains an answer from Gemini, retrieved_chunks, chunk_count, and source: "gemini"  Do not change code unless the test reveals a real bug.
 
+### 26-05-2026 10:39
+- **Prompt**: can u run this and check it works?
+

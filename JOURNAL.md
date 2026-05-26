@@ -1174,6 +1174,31 @@ Only edit JOURNAL.md.
 - **Context and Reasons for Changes**: This keeps the config module aligned with the Gemini helper and the active Flask chat route without changing any other files.
 
 ### **New Interaction**
+- **Agent Version**: 2.3
+- **Date**: 26-05-2026 10:37
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: Help me manually test the Gemini-connected chat route on Windows PowerShell.
+
+Show me the exact commands to:
+1. set GEMINI_API_KEY temporarily
+2. run the Flask backend
+3. upload a small sample txt file to the document upload route
+4. send a chat question to /chat
+5. confirm that the JSON response contains an answer from Gemini, retrieved_chunks, chunk_count, and source: "gemini"
+
+Do not change code unless the test reveals a real bug.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes; preparing manual PowerShell test commands for the Flask Gemini chat route.
+- **Context and Reasons for Changes**: The user wants a copyable Windows PowerShell validation flow for the active Flask backend and Gemini response shape.
+
+### **New Interaction**
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 10:37
 - **Prompt**: Help me manually test the Gemini-connected chat route on Windows PowerShell.  Show me the exact commands to: 1. set GEMINI_API_KEY temporarily 2. run the Flask backend 3. upload a small sample txt file to the document upload route 4. send a chat question to /chat 5. confirm that the JSON response contains an answer from Gemini, retrieved_chunks, chunk_count, and source: "gemini"  Do not change code unless the test reveals a real bug.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 26-05-2026 10:39
+- **Prompt**: can u run this and check it works?
