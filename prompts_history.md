@@ -285,3 +285,6 @@
 ### 26-05-2026 14:19
 - **Prompt**: guide me on how i can manually test this upload
 
+### 26-05-2026 15:01
+- **Prompt**: Now connect the existing ChatPage send() function in frontend/src/App.tsx to the Flask /chat route.  Use sendChatMessage() from frontend/src/api.ts.  Scope: - Edit App.tsx only. - Do not redesign the chat UI. - Keep the existing message bubbles and layout. - Replace the mock AI response with the real backend response. - Send the user message to /chat. - Display data.answer if available. - If the backend returns an error, display the error message as an assistant message. - Keep retrieved_chunks hidden for now unless there is already a simple debug/source area. - Do not modify flashcards or quiz yet. - Do not modify backend files.
+
