@@ -264,3 +264,6 @@
 ### 26-05-2026 13:44
 - **Prompt**: Register the new artifacts blueprint in backend/app.py.  Import artifacts_bp from routes.artifacts and register it with the Flask app.  Do not modify other route logic. Do not modify frontend files.
 
+### 26-05-2026 13:54
+- **Prompt**: A real API key appears in JOURNAL.md and prompts_history.md.  Replace the real key everywhere with [REDACTED]. Do not delete the surrounding journal/prompt entries. Do not add any new API key. Only edit JOURNAL.md and prompts_history.md.  After editing, search the repo for: AIza GEMINI_API_KEY= GOOGLE_API_KEY=  Make sure no real key remains committed.
+
