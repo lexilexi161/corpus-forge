@@ -402,11 +402,10 @@ function ChatPage({
           ? response.answer || "No answer was returned by the backend."
           : response.message || "The backend could not answer this question.";
 
-      
-      const newMessages: Message[] = [...messages, userMsg, { role: "ai" as const, content: assistantText }];
-      if (onSaveChat && newMessages.length >= 2) {
-        const title = newMessages[0]?.content?.slice(0, 40) || "Untitled Chat";
-        onSaveChat(title, newMessages);
+      setMessages((prev) => [...prev, { role: "ai", content: assistantText }]);
+      if (onSaveChat) {
+        const title = (userMsg.content || "Untitled Chat").slice(0, 40);
+        onSaveChat(title, [...messages, userMsg, { role: "ai", content: assistantText }]);
       }
     } catch (error) {
       const message =
@@ -606,15 +605,15 @@ function ArtifactGeneratorPage({
       const parsedCount = Number.parseInt(count, 10);
       const safeCount = Number.isNaN(parsedCount) ? defaultCount : parsedCount;
 
-      const response = (await onGenerate(trimmedTopic, safeCount)) as ArtifactApiResponse;
+      const artifactResponse = (await onGenerate(trimmedTopic, safeCount)) as ArtifactApiResponse;
 
-      if (response.status === "ok") {
-        setContent(response.content || "No content was returned.");
+      if (artifactResponse.status === "ok") {
+        setContent(artifactResponse.content || "No content was returned.");
         return;
       }
 
       setContent("");
-      setError(response.message || response.content || "Could not generate content.");
+      setError(artifactResponse.message || artifactResponse.content || "Could not generate content.");
     } catch (apiError) {
       const message = apiError instanceof Error ? apiError.message : "Could not generate content.";
       setContent("");
@@ -655,7 +654,8 @@ function ArtifactGeneratorPage({
       {error && <p className="artifact-error">{error}</p>}
       {content && (() => {
         try {
-          const parsed = JSON.parse(content);
+          const cleaned = content.replace(/```json\n?|```/g, "").trim();
+          const parsed = JSON.parse(cleaned);
           if (parsed.flashcards) {
             return (
               <div className="artifact-cards">
@@ -675,7 +675,7 @@ function ArtifactGeneratorPage({
                   <div key={i} className="quiz-card">
                     <p className="flashcard-q"><strong>Q{i+1}:</strong> {q.question}</p>
                     <ul className="quiz-options">
-                      {q.options.map((opt, j) => (
+                      {q.options.map((opt: string, j: number) => (
                         <li key={j} className={opt === q.correct_answer ? "correct-option" : ""}>{opt}</li>
                       ))}
                     </ul>
@@ -686,7 +686,7 @@ function ArtifactGeneratorPage({
             );
           }
         } catch {
-          // not json, fall through
+          // not json
         }
         return <pre className="artifact-content">{content}</pre>;
       })()}
@@ -2313,17 +2313,17 @@ const CSS = `
     border-radius: 6px; cursor: pointer; white-space: nowrap; overflow: hidden;
     text-overflow: ellipsis; transition: background 0.15s, color 0.15s;
   }
-  .history-item:hover { background: var(--hover); color: var(--text); }
+  .history-item:hover { background: var(--surface-subtle); color: var(--text); }
 
   .artifact-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; width: 100%; max-width: 640px; }
   .flashcard {
-    background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 12px;
+    background: #F3F4F6; border: 1px solid var(--border); border-radius: 12px;
     padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;
   }
   .flashcard-q { color: var(--text); font-size: 14px; }
   .flashcard-a { color: var(--text-muted); font-size: 14px; }
   .quiz-card {
-    background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 12px;
+    background: #F3F4F6; border: 1px solid var(--border); border-radius: 12px;
     padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;
   }
   .quiz-options { list-style: none; padding: 0; margin: 4px 0; display: flex; flex-direction: column; gap: 4px; }

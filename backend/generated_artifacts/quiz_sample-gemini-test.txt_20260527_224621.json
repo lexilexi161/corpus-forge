@@ -1,0 +1,18 @@
+```json
+{
+  "topic": "Corpus Forge",
+  "questions": [
+    {
+      "question": "What is Corpus Forge?",
+      "options": [
+        "A document Q&A app",
+        "A photo editing app",
+        "A music streaming app",
+        "A video game"
+      ],
+      "correct_answer": "A",
+      "explanation": "Corpus Forge is described as a 'document Q&A app' in the provided text."
+    }
+  ]
+}
+```

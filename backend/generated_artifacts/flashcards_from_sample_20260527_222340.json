@@ -1,0 +1,3 @@
+```json
+{"topic": "Corpus Forge", "flashcards": [{"question": "What is Corpus Forge?", "answer": "Corpus Forge is a document Q&A app."}, {"question": "How does Corpus Forge work?", "answer": "It uses RAG to retrieve chunks from uploaded files."}, {"question": "What should Gemini do with the retrieved context?", "answer": "Gemini should answer using the retrieved context."}]}
+```

@@ -1,0 +1,18 @@
+```json
+{
+  "topic": "Sample-gemini-test.txt",
+  "questions": [
+    {
+      "question": "What is Corpus Forge?",
+      "options": [
+        "A document Q&A app",
+        "A type of computer",
+        "A new programming language",
+        "A tool for drawing pictures"
+      ],
+      "correct_answer": "A",
+      "explanation": "Corpus Forge is described as a document Q&A app in the provided text."
+    }
+  ]
+}
+```

@@ -1,0 +1,53 @@
+# Demo Code Analysis Report
+
+## Code Review Comments
+
+*   **Clarity and Readability**: The code is generally clear and easy to understand. Function names are descriptive.
+*   **Modularity**: The code is broken down into logical functions (`calculate_total`, `apply_discount`, `print_invoice`), which promotes reusability and maintainability.
+*   **Data Structures**: A list of dictionaries is used effectively to represent items with their prices.
+
+## Possible Bugs
+
+*   **No input validation**: The `apply_discount` function does not validate `discount_percent`. A negative discount or a discount greater than 100% would lead to unexpected results (e.g., increasing the total or making it negative).
+*   **Integer division (potential in Python 2)**: While the provided code snippet is likely Python 3 where `/` performs float division, in Python 2, `discount_percent / 100` could result in integer division if both are integers, leading to incorrect discount calculations.
+
+## Architecture Overview
+
+The code follows a simple procedural architecture. It consists of three main functions that perform specific tasks:
+1.  **`calculate_total`**: Aggregates the prices of all items.
+2.  **`apply_discount`**: Calculates the final price after applying a percentage discount.
+3.  **`print_invoice`**: Orchestrates the process by calling the other two functions and then printing the invoice details.
+
+A sample `items` list and a call to `print_invoice` demonstrate the usage.
+
+## Control-Flow Explanation
+
+1.  **`print_invoice` function is called**:
+    *   It receives `customer_name`, `items`, and `discount_percent` as arguments.
+    *   It calls `calculate_total` with the `items` list.
+    *   **Inside `calculate_total`**: It initializes `total` to 0. It then iterates through each `item` in the `items` list and adds the `item["price"]` to `total`. Finally, it returns the computed `total`.
+    *   Back in `print_invoice`, the returned `total` is used.
+    *   It then calls `apply_discount` with `total` and `discount_percent`.
+    *   **Inside `apply_discount`**: It calculates the discount amount and subtracts it from the `total`. It returns the `final_total`.
+    *   Back in `print_invoice`, the returned `final_total` is used.
+    *   The function then prints the customer name, the number of items, and the final total.
+
+2.  **Example Execution**:
+    *   `items` is defined as `[{"name": "Notebook", "price": 5}, {"name": "Pen", "price": 2}]`.
+    *   `print_invoice("Demo Customer", items, 10)` is executed.
+    *   `calculate_total` returns `5 + 2 = 7`.
+    *   `apply_discount` receives `7` and `10`. It calculates `7 - (7 * 10 / 100) = 7 - 0.7 = 6.3`.
+    *   The output will be:
+        ```
+        Invoice for Demo Customer
+        Items: 2
+        Final total: 6.3
+        ```
+
+## Improvement Suggestions
+
+*   **Input Validation**: Add checks in `apply_discount` to ensure `discount_percent` is a valid number (e.g., between 0 and 100 inclusive).
+*   **Error Handling**: Implement `try-except` blocks for potential `KeyError` if an item dictionary is missing a "price" key, or `TypeError` if prices are not numeric.
+*   **Return Types**: Consider returning a dictionary or a custom object from `print_invoice` instead of directly printing, making the function more reusable for other output formats (e.g., returning data to be sent as an API response).
+*   **Constants**: For `discount_percent`, if it's a fixed value, consider using a constant.
+*   **Docstrings**: Add docstrings to each function to explain its purpose, arguments, and return values.
