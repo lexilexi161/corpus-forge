@@ -10,6 +10,7 @@ import {
   saveChat,
   getChats,
   getChatById,
+  deleteChat,
 } from "./api";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -48,7 +49,7 @@ type CostApiResponse = {
 const QUICK_ACTIONS = [
   { label: "Flashcards", icon: "🃏" },
   { label: "Quiz", icon: "📝" },
-  { label: "Code Review", icon: "💻" },
+  { label: "Code Analysis", icon: "💻" },
   { label: "Summarise", icon: "✦" },
   { label: "Q&A", icon: "💬" },
 ];
@@ -366,6 +367,7 @@ function ChatPage({
   onRequireLogin,
   onSaveChat,
   onNavigate,
+  initialMessages = [],
 }: {
   docs: Doc[];
   toggleDoc: (id: string) => void;
@@ -374,8 +376,9 @@ function ChatPage({
   onRequireLogin: () => void;
   onSaveChat?: (title: string, messages: { role: string; content: string }[]) => void;
   onNavigate?: (page: NavItem) => void;
+  initialMessages?: {role: "user" | "ai"; content: string}[];
 }) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const bottomRef = React.useRef<HTMLDivElement>(null);
 
@@ -913,6 +916,7 @@ export default function App() {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
   const [chatKey, setChatKey] = useState(0);
+  const [initialMessages, setInitialMessages] = useState<{role: "user" | "ai"; content: string}[]>([]);
 
   const refreshChatHistory = () => {
     getChats().then((chats) => setChatHistory(chats as ChatHistoryItem[])).catch(() => {});
@@ -1045,6 +1049,7 @@ export default function App() {
               saveChat(title, msgs).then(() => refreshChatHistory()).catch(() => {});
             }}
             onNavigate={(page) => setActiveNav(page)}
+            initialMessages={initialMessages}
           />
         );
       case "Flashcards":
@@ -1122,16 +1127,31 @@ export default function App() {
             <div className="sidebar-history">
               <p className="sidebar-section-label">Recent chats</p>
               {chatHistory.slice(0, 5).map((chat) => (
-                <button
-                  key={chat.chat_id}
-                  type="button"
-                  className="history-item"
-                  onClick={() => {
-                    getChatById(chat.chat_id).then(() => setActiveNav("Chat")).catch(() => {});
-                  }}
-                >
-                  {chat.title}
-                </button>
+                <div key={chat.chat_id} className="history-item-row">
+                  <button
+                    type="button"
+                    className="history-item"
+                    onClick={() => {
+                      getChatById(chat.chat_id).then((msgs: any[]) => {
+                        setInitialMessages(msgs.map((m: any) => ({ role: m.role as "user" | "ai", content: m.content })));
+                        setChatKey(k => k + 1);
+                        setActiveNav("Chat");
+                      }).catch(() => {});
+                    }}
+                  >
+                    {chat.title}
+                  </button>
+                  <button
+                    type="button"
+                    className="history-delete-btn"
+                    onClick={() => {
+                      deleteChat(chat.chat_id).then(() => refreshChatHistory()).catch(() => {});
+                    }}
+                    title="Delete chat"
+                  >
+                    ×
+                  </button>
+                </div>
               ))}
             </div>
           )}
@@ -2293,6 +2313,16 @@ const CSS = `
     text-overflow: ellipsis; transition: background 0.15s, color 0.15s;
   }
   .history-item:hover { background: var(--surface-subtle); color: var(--text); }
+  .history-item-row { display: flex; align-items: center; gap: 4px; }
+  .history-item-row .history-item { flex: 1; }
+  .history-delete-btn {
+    flex-shrink: 0; width: 18px; height: 18px; border-radius: 4px; border: none;
+    background: none; color: var(--text-muted); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; opacity: 0;
+    transition: opacity 0.15s, background 0.15s;
+  }
+  .history-item-row:hover .history-delete-btn { opacity: 1; }
+  .history-delete-btn:hover { background: #fee2e2; color: #b91c1c; }
 
   .artifact-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; width: 100%; max-width: 640px; }
   .flashcard {
