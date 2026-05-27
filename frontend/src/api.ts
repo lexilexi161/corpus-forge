@@ -1,6 +1,4 @@
-/// <reference types="vite/client" />
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:5000";
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL ?? "http://127.0.0.1:5000";
 
 type ChatOptions = {
     audience_level?: string;
@@ -12,17 +10,6 @@ type ArtifactOptions = {
     count?: number;
     audience_level?: string;
     tone?: string;
-};
-
-export type CostApiResponse = {
-    request_count?: number;
-    input_tokens?: number;
-    output_tokens?: number;
-    total_tokens?: number;
-    total_requests?: number;
-    prompt_tokens?: number;
-    completion_tokens?: number;
-    estimated_cost?: number;
 };
 
 async function readErrorMessage(response: Response): Promise<string> {
@@ -93,19 +80,23 @@ export async function generateQuiz(topic: string, options: ArtifactOptions = {})
     });
 }
 
-export async function generateCodeAnalysis(topic: string, options: ArtifactOptions = {}) {
-    return postJson<unknown>("/artifacts/code-analysis", {
-        topic,
-        ...options,
-    });
+export async function saveChat(title: string, messages: { role: string; content: string }[]) {
+    return postJson<unknown>("/chats", { title, messages });
 }
 
+export async function getChats() {
+    const response = await fetch(`${API_BASE_URL}/chats`);
+    return response.json();
+}
+
+export async function getChatById(chatId: number) {
+    const response = await fetch(`${API_BASE_URL}/chats/${chatId}`);
+    return response.json();
+}
+export async function generateCodeAnalysis(topic: string) {
+    return postJson<unknown>("/artifacts/code-analysis", { topic });
+}
 export async function getCost() {
     const response = await fetch(`${API_BASE_URL}/cost`);
-
-    if (!response.ok) {
-        throw new Error(await readErrorMessage(response));
-    }
-
-    return (await response.json()) as CostApiResponse;
+    return response.json();
 }

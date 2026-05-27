@@ -7,6 +7,9 @@ import {
   getCost,
   sendChatMessage,
   uploadDocument,
+  saveChat,
+  getChats,
+  getChatById,
 } from "./api";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -30,6 +33,7 @@ type ArtifactApiResponse = {
   content?: string;
   message?: string;
 };
+type ChatHistoryItem = { chat_id: number; title: string; created_at: string };
 type CostApiResponse = {
   request_count?: number;
   input_tokens?: number;
@@ -360,12 +364,14 @@ function ChatPage({
   userName,
   isLoggedIn,
   onRequireLogin,
+  onSaveChat,
 }: {
   docs: Doc[];
   toggleDoc: (id: string) => void;
   userName: string;
   isLoggedIn: boolean;
   onRequireLogin: () => void;
+  onSaveChat?: (title: string, messages: { role: string; content: string }[]) => void;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -396,7 +402,12 @@ function ChatPage({
           ? response.answer || "No answer was returned by the backend."
           : response.message || "The backend could not answer this question.";
 
-      setMessages((prev) => [...prev, { role: "ai", content: assistantText }]);
+      
+      const newMessages: Message[] = [...messages, userMsg, { role: "ai" as const, content: assistantText }];
+      if (onSaveChat && newMessages.length >= 2) {
+        const title = newMessages[0]?.content?.slice(0, 40) || "Untitled Chat";
+        onSaveChat(title, newMessages);
+      }
     } catch (error) {
       const message =
         error instanceof Error
@@ -642,7 +653,43 @@ function ArtifactGeneratorPage({
       </form>
 
       {error && <p className="artifact-error">{error}</p>}
-      {content && <pre className="artifact-content">{content}</pre>}
+      {content && (() => {
+        try {
+          const parsed = JSON.parse(content);
+          if (parsed.flashcards) {
+            return (
+              <div className="artifact-cards">
+                {parsed.flashcards.map((fc: { question: string; answer: string }, i: number) => (
+                  <div key={i} className="flashcard">
+                    <p className="flashcard-q"><strong>Q:</strong> {fc.question}</p>
+                    <p className="flashcard-a"><strong>A:</strong> {fc.answer}</p>
+                  </div>
+                ))}
+              </div>
+            );
+          }
+          if (parsed.questions) {
+            return (
+              <div className="artifact-cards">
+                {parsed.questions.map((q: { question: string; options: string[]; correct_answer: string; explanation: string }, i: number) => (
+                  <div key={i} className="quiz-card">
+                    <p className="flashcard-q"><strong>Q{i+1}:</strong> {q.question}</p>
+                    <ul className="quiz-options">
+                      {q.options.map((opt, j) => (
+                        <li key={j} className={opt === q.correct_answer ? "correct-option" : ""}>{opt}</li>
+                      ))}
+                    </ul>
+                    <p className="quiz-explanation"><strong>Answer:</strong> {q.correct_answer} — {q.explanation}</p>
+                  </div>
+                ))}
+              </div>
+            );
+          }
+        } catch {
+          // not json, fall through
+        }
+        return <pre className="artifact-content">{content}</pre>;
+      })()}
     </div>
   );
 }
@@ -888,6 +935,15 @@ export default function App() {
   const [uploadStatus, setUploadStatus] = useState("");
   const [uploadError, setUploadError] = useState("");
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
+
+  const refreshChatHistory = () => {
+    getChats().then((chats) => setChatHistory(chats as ChatHistoryItem[])).catch(() => {});
+  };
+
+  React.useEffect(() => {
+    refreshChatHistory();
+  }, []);
 
   React.useEffect(() => {
     const stored = loadStoredUser();
@@ -1007,6 +1063,9 @@ export default function App() {
             userName={userName}
             isLoggedIn={isLoggedIn}
             onRequireLogin={requireLogin}
+            onSaveChat={(title, msgs) => {
+              saveChat(title, msgs).then(() => refreshChatHistory()).catch(() => {});
+            }}
           />
         );
       case "Flashcards":
@@ -1079,6 +1138,24 @@ export default function App() {
               New chat
             </button>
           </div>
+
+          {chatHistory.length > 0 && (
+            <div className="sidebar-history">
+              <p className="sidebar-section-label">Recent chats</p>
+              {chatHistory.slice(0, 5).map((chat) => (
+                <button
+                  key={chat.chat_id}
+                  type="button"
+                  className="history-item"
+                  onClick={() => {
+                    getChatById(chat.chat_id).then(() => setActiveNav("Chat")).catch(() => {});
+                  }}
+                >
+                  {chat.title}
+                </button>
+              ))}
+            </div>
+          )}
 
           <nav className="sidebar-nav">
             {NAV.map(({ label, icon }) => (
@@ -2228,4 +2305,29 @@ const CSS = `
     text-align: left;
     line-height: 1.5;
   }
+
+  .sidebar-history { padding: 8px 12px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+  .history-item {
+    display: block; width: 100%; text-align: left; background: none; border: none;
+    color: var(--text-muted); font-size: 12px; font-family: inherit; padding: 4px 8px;
+    border-radius: 6px; cursor: pointer; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; transition: background 0.15s, color 0.15s;
+  }
+  .history-item:hover { background: var(--hover); color: var(--text); }
+
+  .artifact-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; width: 100%; max-width: 640px; }
+  .flashcard {
+    background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .flashcard-q { color: var(--text); font-size: 14px; }
+  .flashcard-a { color: var(--text-muted); font-size: 14px; }
+  .quiz-card {
+    background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 20px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .quiz-options { list-style: none; padding: 0; margin: 4px 0; display: flex; flex-direction: column; gap: 4px; }
+  .quiz-options li { font-size: 13px; color: var(--text-muted); padding: 4px 8px; border-radius: 6px; }
+  .correct-option { color: #16a34a !important; font-weight: 600; background: #f0fdf4; }
+  .quiz-explanation { font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px; }
 `;
