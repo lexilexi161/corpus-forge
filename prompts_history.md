@@ -300,3 +300,6 @@
 ### 27-05-2026 13:28
 - **Prompt**: Add minimal AI usage/cost observability.  Current issue: The cost page and backend /cost return static zero values.  Smallest safe implementation: - Track request count for routes that call or attempt to call AI:   /chat   /artifacts/flashcards   /artifacts/quiz   /artifacts/code-analysis if it exists - Estimate tokens using a simple approximation: characters / 4. - Use the existing cost table if possible. - Do not change database schema unless absolutely necessary. - If real Gemini token metadata is unavailable, use estimated input_tokens and output_tokens. - Update /cost to return:   request_count   input_tokens   output_tokens   total_tokens  Do not redesign frontend. Keep it simple and easy to explain as estimated usage tracking.
 
+### 27-05-2026 13:35
+- **Prompt**: Connect the Cost frontend page to GET /cost.  Show: - request count - input tokens - output tokens - total tokens  Keep the existing UI style. Do not expose any API keys. Do not redesign the app.
+
