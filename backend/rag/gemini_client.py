@@ -8,10 +8,27 @@ from __future__ import annotations
 
 import os
 
-DEFAULT_MODEL = "gemini-2.0-flash"
+DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+MAX_CONTEXT_CHARS = 6000
 NO_CONTEXT_MESSAGE = (
     "The uploaded documents do not contain enough information to answer this question."
 )
+QUOTA_ERROR_MESSAGE = "Gemini quota has been exceeded for this API key or project."
+GENERIC_API_ERROR_MESSAGE = "Gemini is temporarily unavailable."
+
+
+def _get_api_key():
+    """Read the API key from the environment without hardcoding it."""
+    return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+
+
+def _truncate_context(context_text):
+    """Keep the retrieved context small enough to avoid wasting quota."""
+    if len(context_text) <= MAX_CONTEXT_CHARS:
+        return context_text
+
+    truncated_context = context_text[:MAX_CONTEXT_CHARS].rstrip()
+    return f"{truncated_context}\n\n[Context truncated to keep the prompt small.]"
 
 
 def _format_retrieved_chunks(retrieved_chunks):
@@ -34,7 +51,7 @@ def _format_retrieved_chunks(retrieved_chunks):
             f"Chunk {index} (file_id={file_id}, chunk_index={chunk_index}):\n{chunk_text}"
         )
 
-    return "\n\n".join(lines)
+    return _truncate_context("\n\n".join(lines))
 
 
 def _build_prompt(question, retrieved_chunks, audience_level, tone, output_format):
@@ -103,7 +120,7 @@ def _build_quiz_prompt(topic, retrieved_chunks, count, audience_level, tone):
 
 def _generate_with_prompt(prompt):
     """Call Gemini with a prepared prompt and return text or a safe error."""
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = _get_api_key()
     if not api_key:
         return (
             "GEMINI_API_KEY is not set. Set it in your environment before calling "
@@ -128,11 +145,8 @@ def _generate_with_prompt(prompt):
     except Exception as exc:
         error_text = str(exc)
         if "RESOURCE_EXHAUSTED" in error_text or "quota" in error_text.lower():
-            return (
-                "Gemini quota has been exceeded for this API key or project. "
-                f"{NO_CONTEXT_MESSAGE}"
-            )
-        return "Gemini is temporarily unavailable. " f"{NO_CONTEXT_MESSAGE}"
+            return QUOTA_ERROR_MESSAGE
+        return GENERIC_API_ERROR_MESSAGE
 
 
 def generate_answer(

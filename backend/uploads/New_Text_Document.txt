@@ -1,0 +1,1 @@
+Corpus Forge is an AI document platform. It uploads documents, parses text, chunks content, retrieves relevant information, and uses Gemini to answer questions, generate flashcards, and create quizzes.

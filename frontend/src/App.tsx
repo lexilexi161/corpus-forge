@@ -1,9 +1,33 @@
 import React, { useState } from "react";
 
+import {
+  generateFlashcards,
+  generateQuiz,
+  sendChatMessage,
+  uploadDocument,
+} from "./api";
+
 // ── Types ──────────────────────────────────────────────────────────────────
 type NavItem = "Chat" | "Flashcards" | "Quiz" | "Code Analysis" | "Cost" | "Profile";
-type Doc = { id: string; name: string; type: "PDF" | "MD" | "PY"; checked: boolean };
+type Doc = {
+  id: string;
+  name: string;
+  type: string;
+  checked: boolean;
+  chunkCount?: number;
+  extractedTextLength?: number;
+};
 type Message = { role: "user" | "ai"; content: string };
+type ChatApiResponse = {
+  status?: string;
+  answer?: string;
+  message?: string;
+};
+type ArtifactApiResponse = {
+  status?: string;
+  content?: string;
+  message?: string;
+};
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
@@ -105,7 +129,7 @@ function LoginPage({ onLogin }: { onLogin: (user: StoredUser) => void }) {
   };
 
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [googleError, setGoogleError]     = useState("");
+  const [googleError, setGoogleError] = useState("");
 
   const handleGoogle = () => {
     setGoogleLoading(true);
@@ -340,20 +364,36 @@ function ChatPage({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const send = (text?: string) => {
+  const send = async (text?: string) => {
     const content = text ?? input;
     if (!content.trim()) return;
     if (!isLoggedIn) {
       onRequireLogin();
       return;
     }
+
     const userMsg: Message = { role: "user", content };
-    const aiMsg: Message = {
-      role: "ai",
-      content: "This is a mock response. Connect the backend to get real AI answers from your documents.",
-    };
-    setMessages((prev) => [...prev, userMsg, aiMsg]);
+
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
+
+    try {
+      const response = (await sendChatMessage(content)) as ChatApiResponse;
+
+      const assistantText =
+        response.status === "ok"
+          ? response.answer || "No answer was returned by the backend."
+          : response.message || "The backend could not answer this question.";
+
+      setMessages((prev) => [...prev, { role: "ai", content: assistantText }]);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Could not reach the backend. Please try again.";
+
+      setMessages((prev) => [...prev, { role: "ai", content: message }]);
+    }
   };
 
   const hasMessages = messages.length > 0;
@@ -524,6 +564,92 @@ function PlaceholderPage({ label, icon, onGoChat }: { label: string; icon: strin
   );
 }
 
+// ── Artifact Generator Page ───────────────────────────────────────────────
+function ArtifactGeneratorPage({
+  label,
+  icon,
+  defaultCount,
+  onGenerate,
+}: {
+  label: string;
+  icon: string;
+  defaultCount: number;
+  onGenerate: (topic: string, count?: number) => Promise<unknown>;
+}) {
+  const [topic, setTopic] = useState("");
+  const [count, setCount] = useState(String(defaultCount));
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [content, setContent] = useState("");
+
+  const handleGenerate = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const trimmedTopic = topic.trim();
+    if (!trimmedTopic) {
+      setError("Please enter a topic.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const parsedCount = Number.parseInt(count, 10);
+      const safeCount = Number.isNaN(parsedCount) ? defaultCount : parsedCount;
+
+      const response = (await onGenerate(trimmedTopic, safeCount)) as ArtifactApiResponse;
+
+      if (response.status === "ok") {
+        setContent(response.content || "No content was returned.");
+        return;
+      }
+
+      setContent("");
+      setError(response.message || response.content || "Could not generate content.");
+    } catch (apiError) {
+      const message = apiError instanceof Error ? apiError.message : "Could not generate content.";
+      setContent("");
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="placeholder-page">
+      <span className="placeholder-icon">{icon}</span>
+      <h2 className="placeholder-title">{label}</h2>
+      <p className="placeholder-sub">Generate {label.toLowerCase()} from your uploaded document context.</p>
+
+      <form className="artifact-form" onSubmit={handleGenerate}>
+        <input
+          className="artifact-input"
+          placeholder={`Enter a topic for ${label.toLowerCase()}...`}
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+        />
+
+        <input
+          className="artifact-count"
+          type="number"
+          min={1}
+          value={count}
+          onChange={(e) => setCount(e.target.value)}
+          aria-label="Count"
+        />
+
+        <button type="submit" className="placeholder-cta" disabled={loading}>
+          {loading ? "Generating..." : `Generate ${label}`}
+        </button>
+      </form>
+
+      {error && <p className="artifact-error">{error}</p>}
+      {content && <pre className="artifact-content">{content}</pre>}
+    </div>
+  );
+}
+
 // ── Cost Page ──────────────────────────────────────────────────────────────
 function CostPage() {
   const stats = [
@@ -645,6 +771,9 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("Guest");
   const [userEmail, setUserEmail] = useState("");
+  const [uploadStatus, setUploadStatus] = useState("");
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     const stored = loadStoredUser();
@@ -658,6 +787,69 @@ export default function App() {
   const checkedCount = docs.filter((d) => d.checked).length;
   const toggleDoc = (id: string) =>
     setDocs((prev) => prev.map((d) => (d.id === id ? { ...d, checked: !d.checked } : d)));
+
+  const getDocType = (fileName: string) => {
+    const extension = fileName.split(".").pop()?.toLowerCase() || "";
+    switch (extension) {
+      case "pdf":
+        return "PDF";
+      case "md":
+        return "MD";
+      case "py":
+        return "PY";
+      case "js":
+        return "JS";
+      case "txt":
+        return "TXT";
+      default:
+        return extension.toUpperCase() || "FILE";
+    }
+  };
+
+  const handleAddDocumentClick = () => {
+    setUploadError("");
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadStatus(`Uploading ${file.name}...`);
+    setUploadError("");
+
+    try {
+      const result = (await uploadDocument(file)) as {
+        filename?: string;
+        chunk_count?: number;
+        extracted_text_length?: number;
+        document_Type?: string;
+      };
+
+      const uploadedName = result.filename || file.name;
+      const newDoc: Doc = {
+        id: `${uploadedName}-${Date.now()}`,
+        name: uploadedName,
+        type: result.document_Type || getDocType(uploadedName),
+        checked: true,
+        chunkCount: result.chunk_count,
+        extractedTextLength: result.extracted_text_length,
+      };
+
+      setDocs((prev) => [...prev, newDoc]);
+      setUploadStatus(
+        `Uploaded ${uploadedName}${typeof result.chunk_count === "number" ? ` (${result.chunk_count} chunks)` : ""
+        }.`
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Upload failed.";
+      setUploadError(message);
+      setUploadStatus("");
+    } finally {
+      input.value = "";
+    }
+  };
 
   const handleLogin = (user: StoredUser) => {
     setUserName(user.name);
@@ -680,15 +872,15 @@ export default function App() {
     }
   };
 
-  const requireLogin = () => {};
+  const requireLogin = () => { };
 
   const initials = isLoggedIn
     ? userName
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "?";
 
   const renderMain = () => {
@@ -704,9 +896,23 @@ export default function App() {
           />
         );
       case "Flashcards":
-        return <PlaceholderPage label="Flashcards" icon="🃏" onGoChat={() => setActiveNav("Chat")} />;
+        return (
+          <ArtifactGeneratorPage
+            label="Flashcards"
+            icon="🃏"
+            defaultCount={10}
+            onGenerate={(topic, count) => generateFlashcards(topic, { count })}
+          />
+        );
       case "Quiz":
-        return <PlaceholderPage label="Quiz" icon="📝" onGoChat={() => setActiveNav("Chat")} />;
+        return (
+          <ArtifactGeneratorPage
+            label="Quiz"
+            icon="📝"
+            defaultCount={5}
+            onGenerate={(topic, count) => generateQuiz(topic, { count })}
+          />
+        );
       case "Code Analysis":
         return <PlaceholderPage label="Code Analysis" icon="💻" onGoChat={() => setActiveNav("Chat")} />;
       case "Cost":
@@ -787,9 +993,26 @@ export default function App() {
                 </label>
               ))
             )}
-            <button type="button" className="add-doc-btn">
+            <button type="button" className="add-doc-btn" onClick={handleAddDocumentClick}>
               + Add document
             </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.md,.py,.js,.txt"
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
+            {(uploadStatus || uploadError) && (
+              <p className={`sidebar-upload-status ${uploadError ? "error" : ""}`}>
+                {uploadError || uploadStatus}
+              </p>
+            )}
+            {docs.length > 0 && (
+              <p className="sidebar-upload-hint">
+                {docs.length} document{docs.length === 1 ? "" : "s"} in corpus
+              </p>
+            )}
           </div>
 
           {isLoggedIn ? (
@@ -910,6 +1133,50 @@ const CSS = `
   }
 
   .new-chat-btn:hover { background: var(--accent-soft); }
+
+  .artifact-form {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(520px, 100%);
+  }
+
+  .artifact-input,
+  .artifact-count {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text);
+  }
+
+  .artifact-count {
+    max-width: 140px;
+  }
+
+  .artifact-error {
+    margin-top: 10px;
+    color: #b91c1c;
+    font-size: 13px;
+  }
+
+  .artifact-content {
+    margin-top: 12px;
+    width: min(760px, 100%);
+    max-height: 360px;
+    overflow: auto;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 
   .sidebar-nav {
     padding: 6px 10px;

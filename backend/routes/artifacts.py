@@ -10,7 +10,9 @@ from werkzeug.utils import secure_filename
 from models.db import get_connection
 from rag import retrieve_relevant_chunks
 from rag.gemini_client import (
+    GENERIC_API_ERROR_MESSAGE,
     NO_CONTEXT_MESSAGE,
+    QUOTA_ERROR_MESSAGE,
     generate_flashcards,
     generate_quiz,
 )
@@ -168,6 +170,23 @@ def _build_artifact_success_response(
     )
 
 
+def _build_artifact_error_response(artifact_type, topic, message, retrieved_chunks):
+    return (
+        jsonify(
+            {
+                "status": "error",
+                "artifact_type": artifact_type,
+                "topic": topic,
+                "message": message,
+                "retrieved_chunks": retrieved_chunks,
+                "chunk_count": len(retrieved_chunks),
+                "source": "gemini",
+            }
+        ),
+        503,
+    )
+
+
 @artifacts_bp.route("/artifacts/flashcards", methods=["POST"])
 def create_flashcards() -> Any:
     data = request.get_json(silent=True) or {}
@@ -180,7 +199,7 @@ def create_flashcards() -> Any:
     tone = data.get("tone", "simple")
 
     chunks = load_saved_chunks()
-    retrieved_chunks = retrieve_relevant_chunks(topic, chunks, top_k=5)
+    retrieved_chunks = retrieve_relevant_chunks(topic, chunks, top_k=3)
     if not retrieved_chunks:
         return _handle_no_context_response(topic, "flashcards")
 
@@ -194,6 +213,16 @@ def create_flashcards() -> Any:
 
     if content == NO_CONTEXT_MESSAGE:
         return _handle_no_context_response(topic, "flashcards")
+
+    if content == QUOTA_ERROR_MESSAGE:
+        return _build_artifact_error_response(
+            "flashcards", topic, QUOTA_ERROR_MESSAGE, retrieved_chunks
+        )
+
+    if content == GENERIC_API_ERROR_MESSAGE:
+        return _build_artifact_error_response(
+            "flashcards", topic, GENERIC_API_ERROR_MESSAGE, retrieved_chunks
+        )
 
     try:
         artifact_metadata = _save_generated_artifact(
@@ -236,7 +265,7 @@ def create_quiz() -> Any:
     tone = data.get("tone", "simple")
 
     chunks = load_saved_chunks()
-    retrieved_chunks = retrieve_relevant_chunks(topic, chunks, top_k=5)
+    retrieved_chunks = retrieve_relevant_chunks(topic, chunks, top_k=3)
     if not retrieved_chunks:
         return _handle_no_context_response(topic, "quiz")
 
@@ -250,6 +279,16 @@ def create_quiz() -> Any:
 
     if content == NO_CONTEXT_MESSAGE:
         return _handle_no_context_response(topic, "quiz")
+
+    if content == QUOTA_ERROR_MESSAGE:
+        return _build_artifact_error_response(
+            "quiz", topic, QUOTA_ERROR_MESSAGE, retrieved_chunks
+        )
+
+    if content == GENERIC_API_ERROR_MESSAGE:
+        return _build_artifact_error_response(
+            "quiz", topic, GENERIC_API_ERROR_MESSAGE, retrieved_chunks
+        )
 
     try:
         artifact_metadata = _save_generated_artifact(

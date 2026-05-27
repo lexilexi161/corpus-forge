@@ -3,7 +3,12 @@ import sqlite3
 from flask import Blueprint, jsonify, request
 
 from models.db import get_connection
-from rag.gemini_client import generate_answer
+from rag.gemini_client import (
+    GENERIC_API_ERROR_MESSAGE,
+    NO_CONTEXT_MESSAGE,
+    QUOTA_ERROR_MESSAGE,
+    generate_answer,
+)
 from rag import retrieve_relevant_chunks
 
 chat_bp = Blueprint("chat", __name__)
@@ -49,7 +54,7 @@ def send_message():
         return jsonify({"status": "error", "message": "Missing message"}), 400
 
     chunks = load_saved_chunks()
-    retrieved_chunks = retrieve_relevant_chunks(query, chunks, top_k=5)
+    retrieved_chunks = retrieve_relevant_chunks(query, chunks, top_k=3)
 
     if not retrieved_chunks:
         return (
@@ -89,6 +94,21 @@ def send_message():
             503,
         )
 
+    if answer == QUOTA_ERROR_MESSAGE:
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": QUOTA_ERROR_MESSAGE,
+                    "question": query,
+                    "retrieved_chunks": retrieved_chunks,
+                    "chunk_count": len(retrieved_chunks),
+                    "source": "gemini",
+                }
+            ),
+            503,
+        )
+
     if answer.startswith("Gemini support is not installed yet."):
         return (
             jsonify(
@@ -104,12 +124,12 @@ def send_message():
             503,
         )
 
-    if answer.startswith("Gemini is temporarily unavailable."):
+    if answer == GENERIC_API_ERROR_MESSAGE:
         return (
             jsonify(
                 {
                     "status": "error",
-                    "message": answer,
+                    "message": GENERIC_API_ERROR_MESSAGE,
                     "question": query,
                     "retrieved_chunks": retrieved_chunks,
                     "chunk_count": len(retrieved_chunks),

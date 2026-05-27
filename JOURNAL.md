@@ -1371,3 +1371,27 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 26-05-2026 15:05
 - **Prompt**: Now replace the Flashcards and Quiz placeholder pages with minimal working forms connected to the backend.  Use generateFlashcards() and generateQuiz() from frontend/src/api.ts.  Scope: - Edit App.tsx only. - Do not redesign the whole UI. - Keep the existing PlaceholderPage/page shell/card style as much as possible. - For Flashcards:   - allow user to enter a topic   - allow count if simple   - call /artifacts/flashcards   - show loading, generated content, and errors - For Quiz:   - allow user to enter a topic   - allow count if simple   - call /artifacts/quiz   - show loading, generated content, and errors - Do not modify backend files.
+
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 26-05-2026 15:06
+- **User**: not provided
+- **Prompt**: Now replace the Flashcards and Quiz placeholder pages with minimal working forms connected to the backend using generateFlashcards() and generateQuiz(), edit App.tsx only.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Updated `frontend/src/App.tsx` to replace Flashcards/Quiz placeholders with minimal generator forms wired to backend API helpers, including topic/count inputs, loading state, generated content display, and error display.
+- **Context and Reasons for Changes**: This enables immediate end-to-end artifact generation from the existing UI without redesigning page structure or modifying backend files.
+
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 26-05-2026 15:18
+- **User**: not provided
+- **Prompt**: Make our Gemini/RAG backend more quota-friendly based on the teacher’s lab examples. Use gemini-2.5-flash-lite as the default model, allow GEMINI_MODEL override, keep using environment API keys safely, limit context size, reduce top_k from 5 to 3 in chat and artifacts, and keep quota/API errors separate from no-context responses.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Lowered backend token usage by switching the default Gemini model to `gemini-2.5-flash-lite` with `GEMINI_MODEL` override support, truncating retrieved context to a fixed maximum size, and reducing retrieved chunks from 5 to 3 in chat and artifact routes. Also kept quota/API failures separate from true no-context responses.
+- **Context and Reasons for Changes**: The lab examples emphasize smaller prompts, lightweight models, and safer quota use, so the backend now sends less text to Gemini while preserving the existing RAG flow.
