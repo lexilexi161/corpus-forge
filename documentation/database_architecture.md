@@ -2,77 +2,117 @@
 
 This document mirrors the current SQL schema defined in `backend/database/schema.sql`.
 
-## Tables
+The active application uses SQLite through `backend/models/db.py`. The Flask backend should be started from the `backend` folder so the relative database path `database/corpus-forge.db` resolves correctly.
 
-- `documents`
-  - `document_id` — int, PRIMARY KEY, AUTO_INCREMENT
-  - `document_name` — varchar(255), NOT NULL
-  - `size` — int, NOT NULL
-  - `uploaded_at` — datetime, NOT NULL
-  - `document_type` — varchar(255), NOT NULL
-  - `file_path` — varchar(255), NOT NULL
+## Actively Used Tables
 
-- `chunks`
-  - `file_id` — int, FOREIGN KEY → `documents(document_id)`
-  - `id` — int, PRIMARY KEY, AUTO_INCREMENT
-  - `embedding` — text, NOT NULL
-  - `chunk_order` — int, NOT NULL
-  - `chunk_text` — text, NOT NULL
+### `documents`
 
-- `corpus`
-  - `corpus_id` — int, PRIMARY KEY, AUTO_INCREMENT
-  - `corpus_name` — varchar(255), NOT NULL
-  - `upload_date` — datetime, NOT NULL
-  - `corpus_desc` — text
+Stores uploaded document metadata.
 
-- `corpus_documents` (join table)
-  - `document_id` — int, FOREIGN KEY → `documents(document_id)`
-  - `corpus_id` — int, FOREIGN KEY → `corpus(corpus_id)`
-  - PRIMARY KEY(`document_id`, `corpus_id`)
+- `document_id` - integer primary key
+- `document_name` - uploaded file name
+- `size` - file size in bytes
+- `uploaded_at` - upload timestamp
+- `document_type` - file extension/type
+- `file_path` - local saved path
 
-- `artifacts`
-  - `artifact_id` — int, PRIMARY KEY, AUTO_INCREMENT
-  - `artifact_name` — varchar(255), NOT NULL
-  - `artifact_date` — datetime, NOT NULL
-  - `artifact_size` — int, NOT NULL
-  - `artifact_type` — varchar(255), NOT NULL
-  - `artifact_path` — varchar(255), NOT NULL
-  - `artifact_prompt` — text
-  - `corpus_id` — int, FOREIGN KEY → `corpus(corpus_id)`
-  - `document_id` — int, FOREIGN KEY → `documents(document_id)`
+### `chunks`
 
-- `user`
-  - `user_id` — int, PRIMARY KEY, AUTO_INCREMENT
-  - `username` — varchar(255), NOT NULL
-  - `user_password` — varchar(255), NOT NULL
-  - `date_created` — datetime, NOT NULL
+Stores parsed and chunked text from uploaded documents.
 
-- `session`
-  - `session_id` — int, PRIMARY KEY, AUTO_INCREMENT
-  - `user_id` — int, FOREIGN KEY → `user(user_id)`
-  - `session_token` — varchar(255), NOT NULL
-  - `started_at` — datetime, NOT NULL
-  - `ended_at` — datetime
+- `file_id` - foreign key to `documents(document_id)`
+- `id` - integer primary key
+- `embedding` - text field currently left empty because retrieval is keyword-based
+- `chunk_order` - order of the chunk inside the document
+- `chunk_text` - extracted text for retrieval and prompts
 
-- `cost`
-  - `request_id` — int, PRIMARY KEY, AUTO_INCREMENT
-  - `user_id` — int, FOREIGN KEY → `user(user_id)`
-  - `request_type` — varchar(255), NOT NULL
-  - `input_tokens` — int
-  - `output_tokens` — int
-  - `created_at` — datetime, NOT NULL
+### `artifacts`
 
-## Notes
-- `documents` stores uploaded files and metadata.
-- `chunks` stores document text splits and embeddings linked by `file_id` to `documents.document_id`.
-- `corpus` groups documents; `corpus_documents` maps many-to-many relationships between `corpus` and `documents`.
-- `artifacts` stores generated or derived files, optionally associated to a `corpus` and/or `document`.
-- `user`, `session`, and `cost` tables track users, session tokens, and request cost accounting respectively.
+Stores metadata for generated outputs such as flashcards, quizzes, and code-analysis reports.
+
+- `artifact_id` - integer primary key
+- `artifact_name` - saved artifact file name
+- `artifact_date` - generation timestamp
+- `artifact_size` - saved artifact file size
+- `artifact_type` - `flashcards`, `quiz`, or `code_analysis`
+- `artifact_path` - local path under `backend/generated_artifacts/`
+- `artifact_prompt` - topic/prompt used to generate the artifact
+- `corpus_id` - optional foreign key, currently usually null
+- `document_id` - optional foreign key, currently usually null
+
+### `cost`
+
+Stores estimated AI usage.
+
+- `request_id` - integer primary key
+- `user_id` - optional foreign key to `user(user_id)`
+- `request_type` - route or feature name, such as `chat` or `artifacts_quiz`
+- `input_tokens` - estimated input tokens
+- `output_tokens` - estimated output tokens
+- `created_at` - timestamp
+
+Usage tracking is estimated using a character-count approximation. It does not currently use exact Gemini billing metadata.
+
+## Planned / Partially Used Tables
+
+### `corpus`
+
+Intended to represent named document collections.
+
+- `corpus_id`
+- `corpus_name`
+- `upload_date`
+- `corpus_desc`
+
+### `corpus_documents`
+
+Join table intended to connect documents to corpora.
+
+- `document_id`
+- `corpus_id`
+
+### `user`
+
+Planned user table.
+
+- `user_id`
+- `username`
+- `user_password`
+- `date_created`
+
+### `session`
+
+Planned session table.
+
+- `session_id`
+- `user_id`
+- `session_token`
+- `started_at`
+- `ended_at`
+
+The current frontend profile/login behavior is mostly localStorage-based and is not production authentication.
+
+## Current Persistence Flow
+
+1. User uploads a file through `POST /documents`.
+2. Backend saves the file in `backend/uploads/`.
+3. Backend parses the file and splits text into chunks.
+4. Backend inserts one row into `documents`.
+5. Backend inserts chunk rows into `chunks`.
+6. Chat and artifact routes retrieve from `chunks`.
+7. Generated artifacts are saved in `backend/generated_artifacts/`.
+8. Artifact metadata is inserted into `artifacts`.
+9. Estimated usage is inserted into `cost` for AI-related requests with retrieved context.
+
+## Known Database Limitations
+
+- Retrieval is keyword-based, so `chunks.embedding` is not populated yet.
+- Active frontend document selection does not yet filter backend retrieval.
+- Corpus collection management is not fully implemented.
+- Document deletion is not implemented yet.
+- Exact Gemini token metadata is not stored yet.
 
 ---
 
-Moved from `misc docs/database_architecture.md` to `documentation/database_architecture.md` on 2026-05-18.
-
-If you want additional fields (e.g., checksums, content hashes, or ingestion status), I can add them and update the schema accordingly.
-
-
+The older duplicate file in `misc docs/database_architecture.md` is retained as historical documentation. This file in `documentation/` is the current database architecture reference.
