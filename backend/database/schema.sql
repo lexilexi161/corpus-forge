@@ -63,3 +63,19 @@ output_tokens INTEGER,
 created_at DATETIME NOT NULL,
 FOREIGN KEY(user_id) REFERENCES user(user_id)
 );
+
+CREATE TABLE chats (
+    chat_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL
+);
+ 
+CREATE TABLE chat_messages (
+    message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    chat_id INTEGER NOT NULL,
+    role VARCHAR(10) NOT NULL,
+    content TEXT NOT NULL,
+    created_at DATETIME NOT NULL,
+    FOREIGN KEY(chat_id) REFERENCES chats(chat_id)
+);
+ 
