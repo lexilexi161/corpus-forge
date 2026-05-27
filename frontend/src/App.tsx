@@ -365,6 +365,7 @@ function ChatPage({
   isLoggedIn,
   onRequireLogin,
   onSaveChat,
+  onNavigate,
 }: {
   docs: Doc[];
   toggleDoc: (id: string) => void;
@@ -372,6 +373,7 @@ function ChatPage({
   isLoggedIn: boolean;
   onRequireLogin: () => void;
   onSaveChat?: (title: string, messages: { role: string; content: string }[]) => void;
+  onNavigate?: (page: NavItem) => void;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -462,28 +464,7 @@ function ChatPage({
                 }}
               />
               <div className="hero-input-toolbar">
-                <div className="hero-toolbar-left">
-                  <button type="button" className="toolbar-icon-btn" title="Add attachment" aria-label="Add">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="12" y1="5" x2="12" y2="19" />
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
-                  </button>
-                  <button type="button" className="toolbar-chip">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="11" cy="11" r="8" />
-                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                    Research
-                  </button>
-                </div>
                 <div className="hero-toolbar-right">
-                  <button type="button" className="model-select">
-                    Corpus AI
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                  </button>
                   <button
                     type="button"
                     className="hero-send"
@@ -500,9 +481,11 @@ function ChatPage({
               </div>
             </div>
 
+
+
             <div className="hero-quick-row">
               {QUICK_ACTIONS.map((a) => (
-                <button key={a.label} type="button" className="hero-quick-btn" onClick={() => send(a.label)}>
+                <button key={a.label} type="button" className="hero-quick-btn" onClick={() => onNavigate && onNavigate(a.label as NavItem)}>
                   <span className="hero-quick-icon">{a.icon}</span>
                   {a.label}
                 </button>
@@ -542,14 +525,7 @@ function ChatPage({
 
       {hasMessages && (
         <div className="chat-input-bar">
-          <div className="hero-quick-row compact">
-            {QUICK_ACTIONS.map((a) => (
-              <button key={a.label} type="button" className="hero-quick-btn" onClick={() => send(a.label)}>
-                <span className="hero-quick-icon">{a.icon}</span>
-                {a.label}
-              </button>
-            ))}
-          </div>
+
           <div className="chat-input-row">
             <input
               className="chat-input"
@@ -936,6 +912,7 @@ export default function App() {
   const [uploadError, setUploadError] = useState("");
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
+  const [chatKey, setChatKey] = useState(0);
 
   const refreshChatHistory = () => {
     getChats().then((chats) => setChatHistory(chats as ChatHistoryItem[])).catch(() => {});
@@ -1058,6 +1035,7 @@ export default function App() {
       case "Chat":
         return (
           <ChatPage
+            key={chatKey}
             docs={docs}
             toggleDoc={toggleDoc}
             userName={userName}
@@ -1066,6 +1044,7 @@ export default function App() {
             onSaveChat={(title, msgs) => {
               saveChat(title, msgs).then(() => refreshChatHistory()).catch(() => {});
             }}
+            onNavigate={(page) => setActiveNav(page)}
           />
         );
       case "Flashcards":
@@ -1130,7 +1109,7 @@ export default function App() {
               </div>
               <span className="logo-text">CorpusForge</span>
             </div>
-            <button type="button" className="new-chat-btn" onClick={() => setActiveNav("Chat")}>
+            <button type="button" className="new-chat-btn" onClick={() => { setActiveNav("Chat"); setChatKey(k => k + 1); }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
