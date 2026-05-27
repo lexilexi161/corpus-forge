@@ -1410,3 +1410,13 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 27-05-2026 13:24
 - **Prompt**: Add a minimal source-code analysis report feature using the existing RAG/Gemini/artifact system.  Context: - Upload, parsing, chunking, retrieval, chat, flashcards, and quiz already work. - Source code files like .py and .js are already parsed. - We need code review / architecture-control-flow reports for the capstone requirements.  Smallest safe implementation: - Add a backend route such as POST /artifacts/code-analysis. - Reuse saved chunks and retrieve_relevant_chunks(). - Use Gemini when available. - If Gemini quota is exceeded, use the existing quota-safe fallback pattern. - Save the generated report in backend/generated_artifacts/ and insert metadata into the artifacts table. - Return JSON with:   status   artifact_type: "code_analysis"   topic   content   retrieved_chunks   chunk_count   source  The prompt should ask for: - code review comments - possible bugs - architecture overview - control-flow explanation - improvement suggestions  Do not redesign frontend. Do not change database schema. Do not modify upload/parsing/chunking logic. Keep it simple and demo-ready.
+- **CoPilot Mode**: Edit
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Verified the existing code-analysis artifact endpoint and its Gemini helper were already in place and still matched the requested minimal design. No additional code edits were needed.
+- **Context and Reasons for Changes**: The feature was already implemented in the workspace, so the safest action was to confirm the current route, prompt, storage path, and quota-safe behavior rather than duplicate logic.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 27-05-2026 13:28
+- **Prompt**: Add minimal AI usage/cost observability.  Current issue: The cost page and backend /cost return static zero values.  Smallest safe implementation: - Track request count for routes that call or attempt to call AI:   /chat   /artifacts/flashcards   /artifacts/quiz   /artifacts/code-analysis if it exists - Estimate tokens using a simple approximation: characters / 4. - Use the existing cost table if possible. - Do not change database schema unless absolutely necessary. - If real Gemini token metadata is unavailable, use estimated input_tokens and output_tokens. - Update /cost to return:   request_count   input_tokens   output_tokens   total_tokens  Do not redesign frontend. Keep it simple and easy to explain as estimated usage tracking.
