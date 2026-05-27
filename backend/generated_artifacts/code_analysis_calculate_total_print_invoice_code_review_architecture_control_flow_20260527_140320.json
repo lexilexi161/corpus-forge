@@ -1,0 +1,55 @@
+## Report on `calculate_total` and `print_invoice` Code
+
+This report analyzes the provided Python code snippets related to calculating totals and printing invoices, focusing on code review, potential bugs, architecture, control flow, and improvement suggestions.
+
+### Code Review Comments
+
+*   **Readability:** The code is generally well-structured and easy to read. Function names are descriptive.
+*   **Variable Naming:** Variable names like `total`, `item`, `customer_name`, and `discount_percent` are clear and convey their purpose.
+*   **Functionality:** The functions `calculate_total`, `apply_discount`, and `print_invoice` achieve their intended purposes.
+*   **Example Usage:** A clear example of how to use `print_invoice` is provided, demonstrating the intended workflow.
+
+### Possible Bugs
+
+*   **No Explicit Error Handling for `items`:** The `calculate_total` function assumes `items` is a list and each element is a dictionary with a `"price"` key. If `items` is not a list, or if an item is missing the `"price"` key, a `TypeError` or `KeyError` would occur, crashing the program.
+*   **Discount Percentage Range:** The `apply_discount` function does not validate if `discount_percent` is within a reasonable range (e.g., 0-100). A negative discount would increase the total, and a discount over 100% would result in a negative final total, which might not be intended.
+
+### Architecture Overview
+
+The provided code represents a simple procedural architecture for generating an invoice.
+
+*   **`calculate_total`:** A utility function responsible for summing up prices from a list of items.
+*   **`apply_discount`:** A utility function that takes a total and a discount percentage to calculate the discounted price.
+*   **`print_invoice`:** The main orchestrator function that calls `calculate_total` and `apply_discount` to compute the final invoice details and then prints them to the console.
+
+This architecture is straightforward and suitable for small-scale operations. It separates concerns by having dedicated functions for calculation and printing.
+
+### Control-Flow Explanation
+
+1.  **`print_invoice` Execution:** The execution begins when `print_invoice("Demo Customer", items, 10)` is called.
+2.  **`calculate_total` Call:** Inside `print_invoice`, `calculate_total(items)` is invoked.
+    *   A `total` variable is initialized to `0`.
+    *   The code iterates through each `item` in the `items` list.
+    *   For each `item`, `item["price"]` is added to the `total`.
+    *   The final calculated `total` is returned.
+3.  **`apply_discount` Call:** The returned `total` from `calculate_total` is then passed to `apply_discount(total, discount_percent)`.
+    *   The discount amount is calculated as `(total * discount_percent / 100)`.
+    *   The `final_total` is computed by subtracting the discount amount from the `total`.
+    *   The `final_total` is returned.
+4.  **Printing Invoice Details:** Back in `print_invoice`:
+    *   The customer name, number of items, and the calculated `final_total` are printed to the console using `print()` statements.
+
+### Improvement Suggestions
+
+1.  **Robustness and Error Handling:**
+    *   **`calculate_total`:** Add checks to ensure `items` is a list and that each item has a `"price"` key of a numeric type. Use a `try-except` block to catch potential `TypeError` or `KeyError`.
+    *   **`apply_discount`:** Implement validation for `discount_percent` to ensure it's a non-negative number, ideally within a 0-100 range, to prevent unexpected financial outcomes.
+2.  **Data Structures:**
+    *   Consider using a dedicated class or `dataclass` for `Item` objects instead of dictionaries. This would improve type safety and readability.
+3.  **Output Formatting:**
+    *   The `print_invoice` function currently uses basic `print` statements. For more professional output, consider using f-strings for better formatting of currency and other values.
+    *   For more complex invoicing needs, consider returning a formatted string or a data structure that can be rendered by a separate presentation layer.
+4.  **Modularity:**
+    *   While the current separation is good, for a larger system, `calculate_total` and `apply_discount` could be part of a dedicated `PricingService` or `InvoiceCalculator` class.
+5.  **Testing:**
+    *   Implement unit tests for each function to ensure they behave as expected under various scenarios, including edge cases and invalid inputs.

@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   generateFlashcards,
+  generateCodeAnalysis,
   generateQuiz,
+  getCost,
   sendChatMessage,
   uploadDocument,
 } from "./api";
@@ -27,6 +29,15 @@ type ArtifactApiResponse = {
   status?: string;
   content?: string;
   message?: string;
+};
+type CostApiResponse = {
+  request_count?: number;
+  input_tokens?: number;
+  output_tokens?: number;
+  total_tokens?: number;
+  total_requests?: number;
+  prompt_tokens?: number;
+  completion_tokens?: number;
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -550,20 +561,6 @@ function ChatPage({
   );
 }
 
-// ── Placeholder Page ───────────────────────────────────────────────────────
-function PlaceholderPage({ label, icon, onGoChat }: { label: string; icon: string; onGoChat: () => void }) {
-  return (
-    <div className="placeholder-page">
-      <span className="placeholder-icon">{icon}</span>
-      <h2 className="placeholder-title">{label}</h2>
-      <p className="placeholder-sub">Use the Chat to generate {label.toLowerCase()} from your documents.</p>
-      <button type="button" className="placeholder-cta" onClick={onGoChat}>
-        Go to Chat
-      </button>
-    </div>
-  );
-}
-
 // ── Artifact Generator Page ───────────────────────────────────────────────
 function ArtifactGeneratorPage({
   label,
@@ -650,17 +647,134 @@ function ArtifactGeneratorPage({
   );
 }
 
+// ── Code Analysis Page ────────────────────────────────────────────────────
+function CodeAnalysisPage({
+  icon,
+  onGenerate,
+}: {
+  icon: string;
+  onGenerate: (topic: string) => Promise<unknown>;
+}) {
+  const [topic, setTopic] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [content, setContent] = useState("");
+
+  const handleGenerate = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const trimmedTopic = topic.trim();
+    if (!trimmedTopic) {
+      setError("Please enter a topic or file focus.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = (await onGenerate(trimmedTopic)) as ArtifactApiResponse;
+
+      if (response.status === "ok") {
+        setContent(response.content || "No report was returned.");
+        return;
+      }
+
+      setContent(response.content || "");
+      setError(response.message || response.content || "Could not generate code analysis.");
+    } catch (apiError) {
+      const message = apiError instanceof Error ? apiError.message : "Could not generate code analysis.";
+      setContent("");
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="placeholder-page">
+      <span className="placeholder-icon">{icon}</span>
+      <h2 className="placeholder-title">Code Analysis</h2>
+      <p className="placeholder-sub">Generate a code review report from your uploaded source files.</p>
+
+      <form className="artifact-form" onSubmit={handleGenerate}>
+        <input
+          className="artifact-input"
+          placeholder="Enter a module, feature, or repo topic..."
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+        />
+
+        <button type="submit" className="placeholder-cta" disabled={loading}>
+          {loading ? "Generating..." : "Generate Code Analysis"}
+        </button>
+      </form>
+
+      {error && <p className="artifact-error">{error}</p>}
+      {content && <pre className="artifact-content">{content}</pre>}
+    </div>
+  );
+}
+
 // ── Cost Page ──────────────────────────────────────────────────────────────
 function CostPage() {
-  const stats = [
-    { label: "Total Requests", value: "0" },
-    { label: "Prompt Tokens", value: "0" },
-    { label: "Completion Tokens", value: "0" },
-    { label: "Estimated Cost", value: "$0.000000" },
-  ];
+  const [stats, setStats] = useState([
+    { label: "Request Count", value: "0" },
+    { label: "Input Tokens", value: "0" },
+    { label: "Output Tokens", value: "0" },
+    { label: "Total Tokens", value: "0" },
+  ]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadCost = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const response = (await getCost()) as CostApiResponse;
+        if (!isMounted) {
+          return;
+        }
+
+        const requestCount = response.request_count ?? response.total_requests ?? 0;
+        const inputTokens = response.input_tokens ?? response.prompt_tokens ?? 0;
+        const outputTokens = response.output_tokens ?? response.completion_tokens ?? 0;
+        const totalTokens = response.total_tokens ?? inputTokens + outputTokens;
+
+        setStats([
+          { label: "Request Count", value: String(requestCount) },
+          { label: "Input Tokens", value: String(inputTokens) },
+          { label: "Output Tokens", value: String(outputTokens) },
+          { label: "Total Tokens", value: String(totalTokens) },
+        ]);
+      } catch (fetchError) {
+        if (!isMounted) {
+          return;
+        }
+        setError(fetchError instanceof Error ? fetchError.message : "Could not load cost data.");
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadCost();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <div className="page-shell">
       <h2 className="page-title">Cost & Usage</h2>
+      {loading && <p className="login-email-sub">Loading usage data…</p>}
+      {error && <p className="artifact-error">{error}</p>}
       <div className="cost-grid">
         {stats.map((s) => (
           <div key={s.label} className="stat-card">
@@ -914,7 +1028,7 @@ export default function App() {
           />
         );
       case "Code Analysis":
-        return <PlaceholderPage label="Code Analysis" icon="💻" onGoChat={() => setActiveNav("Chat")} />;
+        return <CodeAnalysisPage icon="💻" onGenerate={(topic) => generateCodeAnalysis(topic)} />;
       case "Cost":
         return <CostPage />;
       case "Profile":

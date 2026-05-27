@@ -118,6 +118,29 @@ def _build_quiz_prompt(topic, retrieved_chunks, count, audience_level, tone):
     )
 
 
+def _build_code_analysis_prompt(topic, retrieved_chunks):
+    """Build a grounded prompt for code analysis generation."""
+    context_block = _format_retrieved_chunks(retrieved_chunks)
+
+    return (
+        "Analyze the uploaded source code context and produce a practical report.\n\n"
+        f"Topic: {topic}\n\n"
+        "Required sections:\n"
+        "- Code review comments\n"
+        "- Possible bugs\n"
+        "- Architecture overview\n"
+        "- Control-flow explanation\n"
+        "- Improvement suggestions\n\n"
+        "Rules:\n"
+        "- Use only the retrieved context when it is enough.\n"
+        f"- If the context does not contain enough information, say: {NO_CONTEXT_MESSAGE}\n"
+        "- Do not invent facts that are not in the retrieved context.\n"
+        "- Keep the report concise, practical, and demo-ready.\n"
+        "- Write the report as plain text with clear headings.\n\n"
+        f"Retrieved context:\n{context_block}"
+    )
+
+
 def _generate_with_prompt(prompt):
     """Call Gemini with a prepared prompt and return text or a safe error."""
     api_key = _get_api_key()
@@ -203,4 +226,13 @@ def generate_quiz(
     prompt = _build_quiz_prompt(
         str(topic), retrieved_chunks, safe_count, audience_level, tone
     )
+    return _generate_with_prompt(prompt)
+
+
+def generate_code_analysis(topic, retrieved_chunks):
+    """Generate a source-code analysis report grounded in retrieved chunks."""
+    if not retrieved_chunks:
+        return NO_CONTEXT_MESSAGE
+
+    prompt = _build_code_analysis_prompt(str(topic), retrieved_chunks)
     return _generate_with_prompt(prompt)

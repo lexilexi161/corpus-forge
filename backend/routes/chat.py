@@ -3,6 +3,7 @@ import sqlite3
 from flask import Blueprint, jsonify, request
 
 from models.db import get_connection
+from routes.cost import build_usage_text, record_estimated_usage
 from rag.gemini_client import (
     GENERIC_API_ERROR_MESSAGE,
     NO_CONTEXT_MESSAGE,
@@ -78,6 +79,15 @@ def send_message():
         tone=tone,
         output_format=output_format,
     )
+
+    usage_input_text = build_usage_text(
+        query,
+        f"audience_level: {audience_level}",
+        f"tone: {tone}",
+        f"output_format: {output_format}",
+        *[chunk.get("text", "") for chunk in retrieved_chunks],
+    )
+    record_estimated_usage("chat", usage_input_text, answer)
 
     if answer.startswith("GEMINI_API_KEY is not set."):
         return (

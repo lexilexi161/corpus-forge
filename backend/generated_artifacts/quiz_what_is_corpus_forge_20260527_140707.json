@@ -1,0 +1,40 @@
+```json
+{
+  "topic": "What is Corpus Forge",
+  "questions": [
+    {
+      "question": "What is the main purpose of Corpus Forge?",
+      "options": [
+        "To transform document collections into actionable knowledge.",
+        "To simply store document chunks.",
+        "To help students learn about AI-assisted development.",
+        "To create a new AI model."
+      ],
+      "correct_answer": "A",
+      "explanation": "Corpus Forge is an AI-powered software platform designed to transform heterogeneous document collections into actionable knowledge, as stated in the Executive Summary."
+    },
+    {
+      "question": "What kind of documents can Corpus Forge handle?",
+      "options": [
+        "Only text documents.",
+        "Multiple document types.",
+        "Only PDF documents.",
+        "Only documents that are already organized."
+      ],
+      "correct_answer": "B",
+      "explanation": "The project objective for Corpus Forge includes designing a system capable of 'Ingesting multiple document types'."
+    },
+    {
+      "question": "Besides storing documents, what else does Corpus Forge do?",
+      "options": [
+        "It only retrieves information.",
+        "It also generates useful knowledge artifacts.",
+        "It does not generate any output.",
+        "It only allows users to steer AI behavior through prompts."
+      ],
+      "correct_answer": "B",
+      "explanation": "The system design for Corpus Forge includes the capability to 'Generating useful knowledge artifacts', in addition to retrieving information and allowing users to steer AI behavior."
+    }
+  ]
+}
+```

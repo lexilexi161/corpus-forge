@@ -1,0 +1,19 @@
+```json
+{
+  "topic": "what is corpus forge",
+  "flashcards": [
+    {
+      "question": "What does Corpus Forge do with documents?",
+      "answer": "Corpus Forge transforms document collections into actionable knowledge."
+    },
+    {
+      "question": "What is Corpus Forge designed to handle?",
+      "answer": "It's designed to handle multiple document types and organize them."
+    },
+    {
+      "question": "What technology does Corpus Forge use to answer questions?",
+      "answer": "Corpus Forge uses Gemini to answer questions from document chunks."
+    }
+  ]
+}
+```

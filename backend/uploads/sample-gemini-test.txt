@@ -1,3 +1,3 @@
-﻿Corpus Forge test document.
-Paris is the capital of France.
-Gemini should answer from this context.
+Corpus Forge is a document Q&A app.
+It uses RAG to retrieve chunks from uploaded files.
+Gemini should answer using the retrieved context.
