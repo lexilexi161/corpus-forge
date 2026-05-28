@@ -332,3 +332,6 @@
 ### 28-05-2026 06:23
 - **Prompt**: yes
 
+### 28-05-2026 06:25
+- **Prompt**: so where can i run it?
+

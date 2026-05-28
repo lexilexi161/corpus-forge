@@ -1567,3 +1567,19 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 28-05-2026 06:23
 - **Prompt**: yes
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 28-05-2026 06:23
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: yes
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Moved the Flask backend and frontend API default off port 5000 to port 8001 to avoid the local service already occupying 5000.
+- **Context and Reasons for Changes**: The browser fetch was failing because the frontend was targeting a port that was not the app.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 28-05-2026 06:25
+- **Prompt**: so where can i run it?
