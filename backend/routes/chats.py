@@ -1,4 +1,5 @@
 import datetime
+import sqlite3
 from flask import Blueprint, jsonify, request
 from models.db import get_connection
 
@@ -13,23 +14,51 @@ def save_chat():
 
     if not messages:
         return jsonify({"status": "error", "message": "No messages"}), 400
+    if not isinstance(messages, list):
+        return jsonify({"status": "error", "message": "Messages must be a list"}), 400
 
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO chats (title, created_at) VALUES (?, ?)",
-        (title, datetime.datetime.now())
-    )
-    chat_id = cursor.lastrowid
-
-    for msg in messages:
+    try:
         cursor.execute(
-            "INSERT INTO chat_messages (chat_id, role, content, created_at) VALUES (?, ?, ?, ?)",
-            (chat_id, msg["role"], msg["content"], datetime.datetime.now())
+            "INSERT INTO chats (title, created_at) VALUES (?, ?)",
+            (title, datetime.datetime.now())
         )
+        chat_id = cursor.lastrowid
 
-    conn.commit()
-    conn.close()
+        for msg in messages:
+            if not isinstance(msg, dict):
+                continue
+
+            role = msg.get("role")
+            content = msg.get("content")
+            if role not in {"user", "ai"} or not content:
+                continue
+
+            cursor.execute(
+                "INSERT INTO chat_messages (chat_id, role, content, created_at) VALUES (?, ?, ?, ?)",
+                (chat_id, role, content, datetime.datetime.now())
+            )
+
+        conn.commit()
+    except sqlite3.Error as exc:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "Failed to save chat.",
+                    "details": str(exc),
+                }
+            ),
+            500,
+        )
+    finally:
+        conn.close()
+
     return jsonify({"status": "ok", "chat_id": chat_id})
 
 
@@ -37,9 +66,23 @@ def save_chat():
 def get_chats():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT chat_id, title, created_at FROM chats ORDER BY created_at DESC")
-    rows = cursor.fetchall()
-    conn.close()
+    try:
+        cursor.execute("SELECT chat_id, title, created_at FROM chats ORDER BY created_at DESC")
+        rows = cursor.fetchall()
+    except sqlite3.Error as exc:
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "Failed to load chats.",
+                    "details": str(exc),
+                }
+            ),
+            500,
+        )
+    finally:
+        conn.close()
+
     return jsonify([{"chat_id": r[0], "title": r[1], "created_at": r[2]} for r in rows])
 
 
@@ -47,10 +90,24 @@ def get_chats():
 def get_chat(chat_id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT role, content FROM chat_messages WHERE chat_id = ? ORDER BY message_id",
-        (chat_id,)
-    )
-    rows = cursor.fetchall()
-    conn.close()
+    try:
+        cursor.execute(
+            "SELECT role, content FROM chat_messages WHERE chat_id = ? ORDER BY message_id",
+            (chat_id,)
+        )
+        rows = cursor.fetchall()
+    except sqlite3.Error as exc:
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "Failed to load chat.",
+                    "details": str(exc),
+                }
+            ),
+            500,
+        )
+    finally:
+        conn.close()
+
     return jsonify([{"role": r[0], "content": r[1]} for r in rows])

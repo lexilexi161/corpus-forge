@@ -54,6 +54,24 @@ Stores estimated AI usage.
 
 Usage tracking is estimated using a character-count approximation. It does not currently use exact Gemini billing metadata.
 
+### `chats`
+
+Stores saved chat conversation titles for the recent chats sidebar.
+
+- `chat_id` - integer primary key
+- `title` - saved chat title
+- `created_at` - timestamp
+
+### `chat_messages`
+
+Stores saved messages for each chat conversation.
+
+- `message_id` - integer primary key
+- `chat_id` - foreign key to `chats(chat_id)`
+- `role` - message role, such as `user` or `ai`
+- `content` - message text
+- `created_at` - timestamp
+
 ## Planned / Partially Used Tables
 
 ### `corpus`
@@ -100,18 +118,20 @@ The current frontend profile/login behavior is mostly localStorage-based and is 
 3. Backend parses the file and splits text into chunks.
 4. Backend inserts one row into `documents`.
 5. Backend inserts chunk rows into `chunks`.
-6. Chat and artifact routes retrieve from `chunks`.
-7. Generated artifacts are saved in `backend/generated_artifacts/`.
-8. Artifact metadata is inserted into `artifacts`.
-9. Estimated usage is inserted into `cost` for AI-related requests with retrieved context.
+6. The frontend reloads saved documents through `GET /documents`.
+7. Chat and artifact routes retrieve from `chunks`, filtered by selected document IDs when provided.
+8. Generated artifacts are saved in `backend/generated_artifacts/`.
+9. Artifact metadata is inserted into `artifacts`.
+10. Estimated usage is inserted into `cost` for AI-related requests with retrieved context.
+11. Frontend chat conversations can be saved through `/chats`, which inserts rows into `chats` and `chat_messages`.
 
 ## Known Database Limitations
 
 - Retrieval is keyword-based, so `chunks.embedding` is not populated yet.
-- Active frontend document selection does not yet filter backend retrieval.
 - Corpus collection management is not fully implemented.
 - Document deletion is not implemented yet.
 - Exact Gemini token metadata is not stored yet.
+- Saved chat persistence currently stores snapshots; a future version could update one ongoing conversation instead.
 
 ---
 

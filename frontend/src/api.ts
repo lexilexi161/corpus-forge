@@ -4,12 +4,14 @@ type ChatOptions = {
     audience_level?: string;
     tone?: string;
     output_format?: string;
+    document_ids?: number[];
 };
 
 type ArtifactOptions = {
     count?: number;
     audience_level?: string;
     tone?: string;
+    document_ids?: number[];
 };
 
 async function readErrorMessage(response: Response): Promise<string> {
@@ -59,6 +61,16 @@ export async function uploadDocument(file: File) {
     return postFormData<unknown>("/documents", formData);
 }
 
+export async function getDocuments() {
+    const response = await fetch(`${API_BASE_URL}/documents`);
+
+    if (!response.ok) {
+        throw new Error(await readErrorMessage(response));
+    }
+
+    return response.json();
+}
+
 export async function sendChatMessage(message: string, options: ChatOptions = {}) {
     return postJson<unknown>("/chat", {
         message,
@@ -86,17 +98,34 @@ export async function saveChat(title: string, messages: { role: string; content:
 
 export async function getChats() {
     const response = await fetch(`${API_BASE_URL}/chats`);
+
+    if (!response.ok) {
+        throw new Error(await readErrorMessage(response));
+    }
+
     return response.json();
 }
 
 export async function getChatById(chatId: number) {
     const response = await fetch(`${API_BASE_URL}/chats/${chatId}`);
+
+    if (!response.ok) {
+        throw new Error(await readErrorMessage(response));
+    }
+
     return response.json();
 }
-export async function generateCodeAnalysis(topic: string) {
-    return postJson<unknown>("/artifacts/code-analysis", { topic });
+
+export async function generateCodeAnalysis(topic: string, options: ArtifactOptions = {}) {
+    return postJson<unknown>("/artifacts/code-analysis", { topic, ...options });
 }
+
 export async function getCost() {
     const response = await fetch(`${API_BASE_URL}/cost`);
+
+    if (!response.ok) {
+        throw new Error(await readErrorMessage(response));
+    }
+
     return response.json();
 }

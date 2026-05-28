@@ -11,11 +11,15 @@ The active backend is the Flask app in `backend/app.py`. The file `backend/main.
 - Upload supported files: `.txt`, `.md`, `.pdf`, `.py`, `.js`.
 - Parse uploaded files and split extracted text into chunks.
 - Store document metadata and chunks in SQLite.
+- Load saved documents back into the frontend sidebar.
+- Filter chat and artifact retrieval by selected active documents.
 - Retrieve relevant chunks with simple keyword matching.
 - Chat/Q&A using Gemini and retrieved document context.
+- Save chat conversations and show recent chats in the sidebar.
 - Generate flashcards from uploaded document context.
 - Generate quizzes from uploaded document context.
-- Generate code analysis reports, including code review, architecture, and control-flow notes.
+- Render flashcards and quizzes as readable cards when Gemini returns valid JSON.
+- Generate formatted code analysis reports, including code review, architecture, and control-flow notes.
 - Save generated artifacts in `backend/generated_artifacts/`.
 - Store generated artifact metadata in the `artifacts` table.
 - Track estimated AI usage with request count and approximate input/output tokens.
@@ -120,8 +124,20 @@ http://127.0.0.1:5000
 - `POST /documents`
   - Uploads a document, saves it locally, parses text, chunks text, and stores document/chunk rows.
 
+- `GET /documents`
+  - Lists saved documents so the frontend sidebar can reload them after refresh.
+
 - `POST /chat`
   - Accepts a user message, retrieves relevant chunks, and asks Gemini for a grounded answer.
+
+- `POST /chats`
+  - Saves a chat title and message list into SQLite.
+
+- `GET /chats`
+  - Lists saved chat conversations for the sidebar.
+
+- `GET /chats/<chat_id>`
+  - Returns saved messages for one chat so the frontend can restore the conversation.
 
 - `POST /artifacts/flashcards`
   - Generates flashcards from retrieved document context.
@@ -145,11 +161,13 @@ http://127.0.0.1:5000
 2. Start the React frontend from the `frontend` folder.
 3. Sign in or create a local frontend profile if prompted.
 4. Upload a `.txt`, `.md`, `.pdf`, `.py`, or `.js` file from the sidebar.
-5. Ask a question in Chat that matches the uploaded document.
-6. Generate flashcards from a topic in the document.
-7. Generate a quiz from a topic in the document.
-8. Upload `sample_code_demo.py` or another source file and run Code Analysis.
-9. Open Cost to show estimated usage after AI requests.
+5. Use the document checkboxes to choose active context.
+6. Ask a question in Chat that matches the uploaded document.
+7. Check that recent chat titles appear in the sidebar and can be reopened.
+8. Generate flashcards from a topic in the document.
+9. Generate a quiz from a topic in the document.
+10. Upload `sample_code_demo.py` or another source file and run Code Analysis.
+11. Open Cost to show estimated usage after AI requests and use Refresh after new AI calls.
 
 For code analysis testing, use a topic that matches uploaded code identifiers, for example:
 
@@ -230,15 +248,16 @@ npm run dev
 
 - Chat says documents do not contain enough information:
   - Upload a relevant file first.
+  - Make sure the relevant document is checked in the sidebar.
   - Ask using terms that appear in the uploaded document.
   - For code analysis, include function or class names from the uploaded source file.
 
 ## Known Limitations
 
 - Retrieval is simple keyword matching, not vector embeddings yet.
-- Active document selection exists visually, but backend retrieval currently searches saved chunks globally rather than filtering by selected documents.
 - Login/profile is mostly frontend/localStorage and is not production authentication.
 - Gemini free quota can cause `429 TooManyRequests`; the app handles this with clear error responses.
-- Flashcard, quiz, and code-analysis output may display as raw JSON/plain text and could use more UI polish.
+- Flashcards and quizzes render as cards when the AI returns valid JSON, with a raw text fallback if parsing fails.
+- Code-analysis output is formatted from plain text, but could still be improved with richer sections/export.
 - Cost tracking uses estimated token counts, not exact Gemini billing metadata.
 - Full corpus collection management and document deletion are future improvements.

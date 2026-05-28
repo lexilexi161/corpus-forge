@@ -1,0 +1,19 @@
+```json
+{
+  "topic": "Corpus Forge",
+  "flashcards": [
+    {
+      "question": "What is Corpus Forge?",
+      "answer": "Corpus Forge is a document Q&A app."
+    },
+    {
+      "question": "What technology does Corpus Forge use?",
+      "answer": "It uses RAG to get information from uploaded files."
+    },
+    {
+      "question": "How does Gemini answer questions in Corpus Forge?",
+      "answer": "Gemini answers using the information it retrieves from your files."
+    }
+  ]
+}
+```

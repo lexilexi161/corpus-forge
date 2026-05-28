@@ -1,0 +1,40 @@
+```json
+{
+  "topic": "Corpus Forge",
+  "questions": [
+    {
+      "question": "What is Corpus Forge?",
+      "options": [
+        "A document Q&A app",
+        "A code editor",
+        "A video editing software",
+        "A music player"
+      ],
+      "correct_answer": "A",
+      "explanation": "The document states that Corpus Forge is a document Q&A app."
+    },
+    {
+      "question": "What technology does Corpus Forge use to find information in uploaded files?",
+      "options": [
+        "RAG",
+        "AI",
+        "Machine Learning",
+        "Blockchain"
+      ],
+      "correct_answer": "A",
+      "explanation": "Corpus Forge uses RAG (Retrieval Augmented Generation) to retrieve relevant chunks from uploaded files."
+    },
+    {
+      "question": "Where should Gemini get the answers from when using Corpus Forge?",
+      "options": [
+        "The retrieved context",
+        "Its own knowledge base",
+        "The internet",
+        "A pre-written script"
+      ],
+      "correct_answer": "A",
+      "explanation": "Gemini should answer using the retrieved context from the uploaded files."
+    }
+  ]
+}
+```

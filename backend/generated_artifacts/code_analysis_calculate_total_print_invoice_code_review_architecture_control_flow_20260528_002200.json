@@ -1,0 +1,47 @@
+Code Review Report
+
+Code Review Comments:
+- The `calculate_total` function correctly iterates through a list of items and sums their prices.
+- The `apply_discount` function correctly calculates the discounted total.
+- The `print_invoice` function orchestrates the invoice generation by calling `calculate_total` and `apply_discount` and then printing the details.
+- The provided example usage for `print_invoice` is clear and demonstrates its functionality.
+
+Possible Bugs:
+- No obvious bugs are present in the provided code snippets for `calculate_total`, `apply_discount`, and `print_invoice`. The logic appears sound for the intended purpose.
+
+Architecture Overview:
+The code defines a simple architecture for generating an invoice. It consists of three main functions:
+1.  `calculate_total`: Responsible for calculating the sum of item prices.
+2.  `apply_discount`: Responsible for applying a percentage-based discount to a given total.
+3.  `print_invoice`: Acts as the main orchestrator, using the other two functions to compute the final invoice total and then printing the invoice details to the console.
+The structure is procedural and follows a clear, sequential flow for invoice generation.
+
+Control-Flow Explanation:
+The control flow for generating an invoice is as follows:
+1.  The `print_invoice` function is called with `customer_name`, a list of `items`, and `discount_percent`.
+2.  Inside `print_invoice`, `calculate_total(items)` is called.
+    *   `calculate_total` initializes `total` to 0.
+    *   It then iterates through each `item` in the `items` list.
+    *   For each `item`, it adds the value of `item["price"]` to `total`.
+    *   Finally, `calculate_total` returns the accumulated `total`.
+3.  The returned `total` from `calculate_total` is then passed to `apply_discount(total, discount_percent)`.
+    *   `apply_discount` calculates the discount amount by multiplying `total` by `discount_percent` and dividing by 100.
+    *   It then subtracts this discount amount from the original `total` to get `final_total`.
+    *   `apply_discount` returns the `final_total`.
+4.  Back in `print_invoice`, the `final_total` is used for printing.
+5.  The `print_invoice` function proceeds to print the customer's name, the number of items, and the `final_total` to the console.
+The example code demonstrates this flow by defining a sample `items` list and calling `print_invoice` with specific customer and discount information.
+
+Improvement Suggestions:
+- **Error Handling**: Consider adding checks for invalid input, such as:
+    - If `items` is empty or not a list.
+    - If `item["price"]` is not a valid number.
+    - If `discount_percent` is negative or excessively large.
+- **Data Structures**: For larger invoices or more complex item data, consider using a dedicated `Item` class or a more robust data structure than dictionaries to represent items.
+- **Output Flexibility**: The current `print_invoice` function only prints to the console. For more practical applications, you might want to extend it to:
+    - Return the invoice details as a dictionary or object.
+    - Generate a formatted string for the invoice.
+    - Integrate with a logging system.
+    - Save the invoice to a file (e.g., text, PDF, HTML).
+- **Currency Handling**: If dealing with different currencies, consider using a dedicated currency or decimal type to avoid floating-point precision issues.
+- **Discount Logic**: The discount is applied only once. If multiple discounts or different discount types are needed, the `apply_discount` function would require modification.

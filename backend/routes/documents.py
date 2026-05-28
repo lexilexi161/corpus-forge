@@ -10,6 +10,47 @@ from werkzeug.utils import secure_filename
 documents_bp = Blueprint("documents", __name__)
 
 
+@documents_bp.route("/documents", methods=["GET"])
+def list_documents():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "SELECT document_id, document_name, size, uploaded_at, document_type, file_path "
+            "FROM documents ORDER BY uploaded_at DESC, document_id DESC"
+        )
+        rows = cursor.fetchall()
+    except sqlite3.Error as exc:
+        return (
+            jsonify(
+                {
+                    "status": "error",
+                    "message": "Failed to load documents.",
+                    "details": str(exc),
+                }
+            ),
+            500,
+        )
+    finally:
+        conn.close()
+
+    documents = []
+    for row in rows:
+        documents.append(
+            {
+                "document_id": row[0],
+                "filename": row[1],
+                "size": row[2],
+                "uploaded_at": row[3],
+                "document_type": row[4],
+                "filepath": row[5],
+            }
+        )
+
+    return jsonify({"status": "ok", "documents": documents})
+
+
 @documents_bp.route("/documents", methods=["POST"])
 def add_file():
     if "file" not in request.files:
@@ -116,6 +157,7 @@ def add_file():
             "uploaded_at": uploaded_at_string,
             "document_Type": document_type,
             "filepath": saved_path,
+            "document_id": document_id,
             "chunk_count": chunk_count,
             "extracted_text_length": extracted_text_length,
         }

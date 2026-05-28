@@ -25,11 +25,22 @@ This file reflects the current repo state before the capstone presentation.
 - [x] Add flashcard generation.
 - [x] Add quiz generation.
 - [x] Add code analysis / code review / architecture-control-flow report generation.
+- [x] Render valid flashcard JSON as question/answer cards.
+- [x] Render valid quiz JSON as question cards with options and explanations.
 - [x] Save generated flashcards, quizzes, and code reports in `backend/generated_artifacts/`.
 - [x] Save generated artifact metadata in the `artifacts` table.
+- [x] Add saved chat tables and `/chats` routes.
+- [x] Show recent chat titles in the sidebar.
+- [x] Make clicking a recent chat restore the selected conversation in the active chat panel.
 - [x] Add estimated request/token usage tracking.
 - [x] Add `GET /cost`.
 - [x] Connect the frontend Cost page to backend usage data.
+- [x] Add a frontend refresh button on the Cost page.
+- [x] Make active document selection control backend retrieval.
+- [x] Add `GET /documents` so uploaded documents persist visibly after frontend refresh.
+- [x] Improve fallback display when generated flashcards/quizzes are not valid JSON.
+- [x] Improve code-analysis report display beyond a raw preformatted block.
+- [x] Fix hero quick-action navigation labels.
 - [x] Add quota, missing-key, and no-context error handling.
 - [x] Create `README.md`.
 - [x] Create/update `REPORT.md`.
@@ -39,11 +50,6 @@ This file reflects the current repo state before the capstone presentation.
 
 ## In Progress / Polish
 
-- [ ] Improve artifact display so flashcards and quizzes render as polished cards instead of raw JSON/plain text.
-- [ ] Improve code-analysis report display and formatting.
-- [ ] Add a frontend refresh button or auto-refresh after AI calls on the Cost page.
-- [ ] Make active document selection control backend retrieval.
-- [ ] Add a backend document list endpoint so uploaded documents persist visibly after frontend refresh.
 - [ ] Add more manual test screenshots/evidence for the presentation.
 - [ ] Finalize presentation/demo script.
 - [ ] Commit final documentation and demo-readiness changes.
@@ -51,12 +57,12 @@ This file reflects the current repo state before the capstone presentation.
 ## Future Improvements
 
 - [ ] Add vector search / embeddings.
-- [ ] Add active document filtering in the backend.
 - [ ] Add document deletion.
 - [ ] Add full corpus collection management.
 - [ ] Add production authentication instead of localStorage-only profile behavior.
 - [ ] Use exact Gemini token usage metadata if available.
-- [ ] Improve UI rendering for generated flashcards, quizzes, and reports.
+- [ ] Add richer generated report export and formatting.
 - [ ] Add automated tests for upload, parsing, retrieval, chat, artifacts, and cost.
 - [ ] Add artifact listing/download/export.
 - [ ] Add better source-code analysis options, such as selecting a specific uploaded file.
+- [ ] Update saved chats instead of creating a new saved snapshot after each response.

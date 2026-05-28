@@ -63,6 +63,7 @@ Expected:
 - Response includes `extracted_text_length`.
 - File is saved under `backend/uploads/`.
 - Document metadata and chunks are saved in SQLite.
+- A `GET /documents` request returns the saved document for the frontend sidebar.
 
 Honest note:
 
@@ -92,10 +93,46 @@ Expected:
 - Response includes `retrieved_chunks`.
 - Response includes `chunk_count`.
 - If Gemini quota is available, response includes a grounded `answer`.
+- If active documents are selected in the frontend sidebar, the request sends those document IDs so retrieval is filtered to the selected context.
 - If no context is found, response clearly says the uploaded documents do not contain enough information.
 - If quota is exceeded, response clearly reports a Gemini quota/rate-limit issue instead of crashing.
+- After sending messages from the frontend, recent chat titles should appear in the sidebar.
 
-## 5. Flashcards Test
+Expected in frontend:
+
+- Recent chat titles are saved and listed.
+- Clicking a saved chat reloads its saved messages into the chat panel.
+
+## 5. Chat History Test
+
+List saved chats:
+
+```powershell
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/chats" -Method Get
+```
+
+Expected:
+
+- Response is a list of saved chats with:
+  - `chat_id`
+  - `title`
+  - `created_at`
+
+Fetch one saved chat:
+
+```powershell
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/chats/1" -Method Get
+```
+
+Expected:
+
+- Response is a list of saved messages with `role` and `content`, if chat `1` exists.
+
+Honest note:
+
+- The current implementation saves chat snapshots. A future version should update the same conversation instead of creating repeated saved entries after each response.
+
+## 6. Flashcards Test
 
 Command:
 
@@ -120,12 +157,14 @@ Expected:
 - Response includes `retrieved_chunks` and `chunk_count`.
 - If generation succeeds, a file is saved in `backend/generated_artifacts/`.
 - If generation succeeds, metadata is inserted into the `artifacts` table.
+- In the frontend, valid JSON flashcards should render as readable question/answer cards.
+- If the selected document checkboxes are used, generation should use only those active document IDs.
 
 Honest note:
 
-- The UI may display raw JSON/text output. This is functional but needs polish.
+- If Gemini returns malformed JSON or non-JSON text, the UI falls back to a readable text card.
 
-## 6. Quiz Test
+## 7. Quiz Test
 
 Command:
 
@@ -150,12 +189,14 @@ Expected:
 - Response includes `retrieved_chunks` and `chunk_count`.
 - If generation succeeds, a file is saved in `backend/generated_artifacts/`.
 - If generation succeeds, metadata is inserted into the `artifacts` table.
+- In the frontend, valid JSON quiz output should render as question cards with options, answer, and explanation.
+- If the selected document checkboxes are used, generation should use only those active document IDs.
 
 Honest note:
 
-- The UI may display raw JSON/text output. This is functional but needs polish.
+- If Gemini returns malformed JSON or non-JSON text, the UI falls back to a readable text card.
 
-## 7. Code Analysis Test
+## 8. Code Analysis Test
 
 Upload the sample Python file:
 
@@ -186,11 +227,10 @@ Expected:
 - If generation succeeds, report content is saved in `backend/generated_artifacts/`.
 - If generation succeeds, metadata is inserted into the `artifacts` table.
 
-Honest note:
-
 - Because retrieval is keyword-based, the topic should include names that appear in the uploaded code, such as function names.
+- Code-analysis reports display as formatted report text in the frontend.
 
-## 8. Cost Test
+## 9. Cost Test
 
 Command:
 
@@ -206,13 +246,14 @@ Expected:
   - `output_tokens`
   - `total_tokens`
 - After successful or attempted AI calls with retrieved context, values should increase.
+- The frontend Cost page has a Refresh button to reload these values after new requests.
 
 Honest note:
 
 - Token values are estimated with a simple character-count approximation, not exact Gemini billing metadata.
 - If no AI calls have been made since cost tracking was added, values may still be zero.
 
-## 9. Security Check
+## 10. Security Check
 
 Command:
 
@@ -226,7 +267,7 @@ Expected:
 - No real API keys are committed.
 - Documentation may mention placeholder text such as `GEMINI_API_KEY = "your_api_key_here"`, but should not contain a real key.
 
-## 10. Conflict Check
+## 11. Conflict Check
 
 Command:
 
@@ -243,5 +284,6 @@ Expected:
 
 - Use the browser for the main demo: upload, chat, flashcards, quiz, code analysis, and cost.
 - Keep curl commands ready as backup if the browser state gets confusing.
+- Sidebar navigation and hero quick actions can be used for the main pages.
 - If Gemini quota fails during the live demo, show the clear error behavior and explain that reliability handling was part of the engineering challenge.
 - Do not show or paste a real API key during the presentation.

@@ -15,15 +15,39 @@ from rag import retrieve_relevant_chunks
 chat_bp = Blueprint("chat", __name__)
 
 
-def load_saved_chunks():
+def _extract_document_ids(data):
+    raw_ids = data.get("document_ids") or data.get("documentIds") or []
+    if not isinstance(raw_ids, list):
+        return []
+
+    document_ids = []
+    for raw_id in raw_ids:
+        try:
+            document_ids.append(int(raw_id))
+        except (TypeError, ValueError):
+            continue
+
+    return document_ids
+
+
+def load_saved_chunks(document_ids=None):
     """Load saved chunks from SQLite for retrieval."""
     conn = get_connection()
     cursor = conn.cursor()
 
     try:
-        cursor.execute(
-            "SELECT file_id, chunk_order, chunk_text FROM chunks ORDER BY file_id, chunk_order, id"
-        )
+        if document_ids:
+            placeholders = ",".join("?" for _ in document_ids)
+            cursor.execute(
+                f"SELECT file_id, chunk_order, chunk_text FROM chunks "
+                f"WHERE file_id IN ({placeholders}) "
+                "ORDER BY file_id, chunk_order, id",
+                document_ids,
+            )
+        else:
+            cursor.execute(
+                "SELECT file_id, chunk_order, chunk_text FROM chunks ORDER BY file_id, chunk_order, id"
+            )
         rows = cursor.fetchall()
     except sqlite3.Error:
         rows = []
@@ -50,11 +74,12 @@ def send_message():
     audience_level = data.get("audience_level", "beginner")
     tone = data.get("tone", "simple")
     output_format = data.get("output_format", "paragraph")
+    document_ids = _extract_document_ids(data)
 
     if not query:
         return jsonify({"status": "error", "message": "Missing message"}), 400
 
-    chunks = load_saved_chunks()
+    chunks = load_saved_chunks(document_ids)
     retrieved_chunks = retrieve_relevant_chunks(query, chunks, top_k=3)
 
     if not retrieved_chunks:
@@ -66,6 +91,7 @@ def send_message():
                     "question": query,
                     "retrieved_chunks": retrieved_chunks,
                     "chunk_count": 0,
+                    "document_ids": document_ids,
                     "source": "gemini",
                 }
             ),
@@ -156,6 +182,7 @@ def send_message():
             "answer": answer,
             "retrieved_chunks": retrieved_chunks,
             "chunk_count": len(retrieved_chunks),
+            "document_ids": document_ids,
             "source": "gemini",
         }
     )

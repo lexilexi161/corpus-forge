@@ -5,6 +5,7 @@ import {
   generateCodeAnalysis,
   generateQuiz,
   getCost,
+  getDocuments,
   sendChatMessage,
   uploadDocument,
   saveChat,
@@ -16,6 +17,7 @@ import {
 type NavItem = "Chat" | "Flashcards" | "Quiz" | "Code Analysis" | "Cost" | "Profile";
 type Doc = {
   id: string;
+  documentId?: number;
   name: string;
   type: string;
   checked: boolean;
@@ -34,6 +36,7 @@ type ArtifactApiResponse = {
   message?: string;
 };
 type ChatHistoryItem = { chat_id: number; title: string; created_at: string };
+type QuickAction = { label: string; icon: string; target: NavItem };
 type CostApiResponse = {
   request_count?: number;
   input_tokens?: number;
@@ -45,12 +48,12 @@ type CostApiResponse = {
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────
-const QUICK_ACTIONS = [
-  { label: "Flashcards", icon: "🃏" },
-  { label: "Quiz", icon: "📝" },
-  { label: "Code Review", icon: "💻" },
-  { label: "Summarise", icon: "✦" },
-  { label: "Q&A", icon: "💬" },
+const QUICK_ACTIONS: QuickAction[] = [
+  { label: "Flashcards", icon: "🃏", target: "Flashcards" },
+  { label: "Quiz", icon: "📝", target: "Quiz" },
+  { label: "Code Analysis", icon: "💻", target: "Code Analysis" },
+  { label: "Cost", icon: "✦", target: "Cost" },
+  { label: "Q&A", icon: "💬", target: "Chat" },
 ];
 
 const NAV: { label: NavItem; icon: React.ReactNode }[] = [
@@ -366,6 +369,7 @@ function ChatPage({
   onRequireLogin,
   onSaveChat,
   onNavigate,
+  initialMessages = [],
 }: {
   docs: Doc[];
   toggleDoc: (id: string) => void;
@@ -374,10 +378,15 @@ function ChatPage({
   onRequireLogin: () => void;
   onSaveChat?: (title: string, messages: { role: string; content: string }[]) => void;
   onNavigate?: (page: NavItem) => void;
+  initialMessages?: Message[];
 }) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const bottomRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    setMessages(initialMessages);
+  }, [initialMessages]);
 
   React.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -397,17 +406,21 @@ function ChatPage({
     setInput("");
 
     try {
-      const response = (await sendChatMessage(content)) as ChatApiResponse;
+      const documentIds = docs
+        .filter((doc) => doc.checked && typeof doc.documentId === "number")
+        .map((doc) => doc.documentId as number);
+      const response = (await sendChatMessage(content, { document_ids: documentIds })) as ChatApiResponse;
 
       const assistantText =
         response.status === "ok"
           ? response.answer || "No answer was returned by the backend."
           : response.message || "The backend could not answer this question.";
 
-      setMessages((prev) => [...prev, { role: "ai", content: assistantText }]);
+      const finalMessages = [...messages, userMsg, { role: "ai" as const, content: assistantText }];
+      setMessages(finalMessages);
       if (onSaveChat) {
         const title = (userMsg.content || "Untitled Chat").slice(0, 40);
-        onSaveChat(title, [...messages, userMsg, { role: "ai", content: assistantText }]);
+        onSaveChat(title, finalMessages);
       }
     } catch (error) {
       const message =
@@ -485,7 +498,7 @@ function ChatPage({
 
             <div className="hero-quick-row">
               {QUICK_ACTIONS.map((a) => (
-                <button key={a.label} type="button" className="hero-quick-btn" onClick={() => onNavigate && onNavigate(a.label as NavItem)}>
+                <button key={a.label} type="button" className="hero-quick-btn" onClick={() => onNavigate && onNavigate(a.target)}>
                   <span className="hero-quick-icon">{a.icon}</span>
                   {a.label}
                 </button>
@@ -548,16 +561,69 @@ function ChatPage({
 }
 
 // ── Artifact Generator Page ───────────────────────────────────────────────
+function cleanGeneratedContent(content: string) {
+  return content.replace(/```json\n?|```/g, "").trim();
+}
+
+function renderTextFallback(content: string) {
+  const lines = content
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (!lines.length) {
+    return null;
+  }
+
+  return (
+    <div className="artifact-text-card">
+      {lines.map((line, index) => (
+        <p key={index}>{line}</p>
+      ))}
+    </div>
+  );
+}
+
+function renderReportContent(content: string) {
+  const lines = content
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (!lines.length) {
+    return null;
+  }
+
+  return (
+    <div className="report-content">
+      {lines.map((line, index) => {
+        const normalized = line.replace(/^#+\s*/, "").replace(/\*\*/g, "");
+        const isHeading =
+          /^(code review|possible bugs|architecture|control-flow|control flow|improvement|overview)/i.test(normalized) ||
+          normalized.endsWith(":");
+
+        return isHeading ? (
+          <h3 key={index}>{normalized}</h3>
+        ) : (
+          <p key={index}>{normalized.replace(/^\s*[-*]\s*/, "")}</p>
+        );
+      })}
+    </div>
+  );
+}
+
 function ArtifactGeneratorPage({
   label,
   icon,
   defaultCount,
   onGenerate,
+  documentIds,
 }: {
   label: string;
   icon: string;
   defaultCount: number;
-  onGenerate: (topic: string, count?: number) => Promise<unknown>;
+  onGenerate: (topic: string, count?: number, documentIds?: number[]) => Promise<unknown>;
+  documentIds: number[];
 }) {
   const [topic, setTopic] = useState("");
   const [count, setCount] = useState(String(defaultCount));
@@ -581,7 +647,7 @@ function ArtifactGeneratorPage({
       const parsedCount = Number.parseInt(count, 10);
       const safeCount = Number.isNaN(parsedCount) ? defaultCount : parsedCount;
 
-      const artifactResponse = (await onGenerate(trimmedTopic, safeCount)) as ArtifactApiResponse;
+      const artifactResponse = (await onGenerate(trimmedTopic, safeCount, documentIds)) as ArtifactApiResponse;
 
       if (artifactResponse.status === "ok") {
         setContent(artifactResponse.content || "No content was returned.");
@@ -630,7 +696,7 @@ function ArtifactGeneratorPage({
       {error && <p className="artifact-error">{error}</p>}
       {content && (() => {
         try {
-          const cleaned = content.replace(/```json\n?|```/g, "").trim();
+          const cleaned = cleanGeneratedContent(content);
           const parsed = JSON.parse(cleaned);
           if (parsed.flashcards) {
             return (
@@ -664,7 +730,7 @@ function ArtifactGeneratorPage({
         } catch {
           // not json
         }
-        return <pre className="artifact-content">{content}</pre>;
+        return renderTextFallback(content);
       })()}
     </div>
   );
@@ -674,9 +740,11 @@ function ArtifactGeneratorPage({
 function CodeAnalysisPage({
   icon,
   onGenerate,
+  documentIds,
 }: {
   icon: string;
-  onGenerate: (topic: string) => Promise<unknown>;
+  onGenerate: (topic: string, documentIds?: number[]) => Promise<unknown>;
+  documentIds: number[];
 }) {
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
@@ -696,7 +764,7 @@ function CodeAnalysisPage({
     setError("");
 
     try {
-      const response = (await onGenerate(trimmedTopic)) as ArtifactApiResponse;
+      const response = (await onGenerate(trimmedTopic, documentIds)) as ArtifactApiResponse;
 
       if (response.status === "ok") {
         setContent(response.content || "No report was returned.");
@@ -734,7 +802,7 @@ function CodeAnalysisPage({
       </form>
 
       {error && <p className="artifact-error">{error}</p>}
-      {content && <pre className="artifact-content">{content}</pre>}
+      {content && renderReportContent(content)}
     </div>
   );
 }
@@ -749,6 +817,7 @@ function CostPage() {
   ]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -791,11 +860,16 @@ function CostPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [reloadKey]);
 
   return (
     <div className="page-shell">
-      <h2 className="page-title">Cost & Usage</h2>
+      <div className="page-title-row">
+        <h2 className="page-title">Cost & Usage</h2>
+        <button type="button" className="profile-edit-btn" onClick={() => setReloadKey((key) => key + 1)} disabled={loading}>
+          {loading ? "Refreshing..." : "Refresh"}
+        </button>
+      </div>
       {loading && <p className="login-email-sub">Loading usage data…</p>}
       {error && <p className="artifact-error">{error}</p>}
       <div className="cost-grid">
@@ -913,6 +987,7 @@ export default function App() {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
   const [chatKey, setChatKey] = useState(0);
+  const [selectedChatMessages, setSelectedChatMessages] = useState<Message[]>([]);
 
   const refreshChatHistory = () => {
     getChats().then((chats) => setChatHistory(chats as ChatHistoryItem[])).catch(() => {});
@@ -920,6 +995,31 @@ export default function App() {
 
   React.useEffect(() => {
     refreshChatHistory();
+  }, []);
+
+  React.useEffect(() => {
+    getDocuments()
+      .then((response) => {
+        const loadedDocs = ((response as { documents?: unknown[] }).documents || [])
+          .map((doc) => {
+            const item = doc as {
+              document_id?: number;
+              filename?: string;
+              document_type?: string;
+            };
+            const name = item.filename || "Untitled document";
+            return {
+              id: String(item.document_id ?? name),
+              documentId: item.document_id,
+              name,
+              type: item.document_type || getDocType(name),
+              checked: true,
+            } as Doc;
+          });
+
+        setDocs(loadedDocs);
+      })
+      .catch(() => {});
   }, []);
 
   React.useEffect(() => {
@@ -932,6 +1032,9 @@ export default function App() {
   }, []);
 
   const checkedCount = docs.filter((d) => d.checked).length;
+  const activeDocumentIds = docs
+    .filter((doc) => doc.checked && typeof doc.documentId === "number")
+    .map((doc) => doc.documentId as number);
   const toggleDoc = (id: string) =>
     setDocs((prev) => prev.map((d) => (d.id === id ? { ...d, checked: !d.checked } : d)));
 
@@ -969,6 +1072,7 @@ export default function App() {
     try {
       const result = (await uploadDocument(file)) as {
         filename?: string;
+        document_id?: number;
         chunk_count?: number;
         extracted_text_length?: number;
         document_Type?: string;
@@ -976,7 +1080,8 @@ export default function App() {
 
       const uploadedName = result.filename || file.name;
       const newDoc: Doc = {
-        id: `${uploadedName}-${Date.now()}`,
+        id: String(result.document_id ?? `${uploadedName}-${Date.now()}`),
+        documentId: result.document_id,
         name: uploadedName,
         type: result.document_Type || getDocType(uploadedName),
         checked: true,
@@ -1045,6 +1150,7 @@ export default function App() {
               saveChat(title, msgs).then(() => refreshChatHistory()).catch(() => {});
             }}
             onNavigate={(page) => setActiveNav(page)}
+            initialMessages={selectedChatMessages}
           />
         );
       case "Flashcards":
@@ -1053,7 +1159,8 @@ export default function App() {
             label="Flashcards"
             icon="🃏"
             defaultCount={10}
-            onGenerate={(topic, count) => generateFlashcards(topic, { count })}
+            onGenerate={(topic, count, documentIds) => generateFlashcards(topic, { count, document_ids: documentIds })}
+            documentIds={activeDocumentIds}
           />
         );
       case "Quiz":
@@ -1062,11 +1169,12 @@ export default function App() {
             label="Quiz"
             icon="📝"
             defaultCount={5}
-            onGenerate={(topic, count) => generateQuiz(topic, { count })}
+            onGenerate={(topic, count, documentIds) => generateQuiz(topic, { count, document_ids: documentIds })}
+            documentIds={activeDocumentIds}
           />
         );
       case "Code Analysis":
-        return <CodeAnalysisPage icon="💻" onGenerate={(topic) => generateCodeAnalysis(topic)} />;
+        return <CodeAnalysisPage icon="💻" onGenerate={(topic, documentIds) => generateCodeAnalysis(topic, { document_ids: documentIds })} documentIds={activeDocumentIds} />;
       case "Cost":
         return <CostPage />;
       case "Profile":
@@ -1109,7 +1217,7 @@ export default function App() {
               </div>
               <span className="logo-text">CorpusForge</span>
             </div>
-            <button type="button" className="new-chat-btn" onClick={() => { setActiveNav("Chat"); setChatKey(k => k + 1); }}>
+            <button type="button" className="new-chat-btn" onClick={() => { setSelectedChatMessages([]); setActiveNav("Chat"); setChatKey(k => k + 1); }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
@@ -1127,7 +1235,13 @@ export default function App() {
                   type="button"
                   className="history-item"
                   onClick={() => {
-                    getChatById(chat.chat_id).then(() => setActiveNav("Chat")).catch(() => {});
+                    getChatById(chat.chat_id)
+                      .then((messages) => {
+                        setSelectedChatMessages(messages as Message[]);
+                        setActiveNav("Chat");
+                        setChatKey((key) => key + 1);
+                      })
+                      .catch(() => {});
                   }}
                 >
                   {chat.title}
@@ -1346,6 +1460,47 @@ const CSS = `
     line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-word;
+  }
+
+  .artifact-text-card,
+  .report-content {
+    margin-top: 16px;
+    width: min(760px, 100%);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+  }
+
+  .artifact-text-card p,
+  .report-content p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .report-content h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 4px;
+  }
+
+  .page-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .page-title-row .page-title {
+    margin-bottom: 0;
   }
 
   .sidebar-nav {

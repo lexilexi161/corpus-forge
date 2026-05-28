@@ -36,12 +36,13 @@ The application has four main layers:
   - Routes:
     - `backend/routes/documents.py`
     - `backend/routes/chat.py`
+    - `backend/routes/chats.py`
     - `backend/routes/artifacts.py`
     - `backend/routes/cost.py`
 
 - SQLite database
   - Schema in `backend/database/schema.sql`.
-  - Stores uploaded document metadata, chunks, artifact metadata, users/sessions, and estimated cost usage.
+  - Stores uploaded document metadata, chunks, artifact metadata, saved chats/messages, users/sessions, and estimated cost usage.
 
 - RAG and Gemini layer
   - Parsing: `backend/rag/parser.py`
@@ -71,23 +72,27 @@ Implemented. The upload endpoint accepts `.txt`, `.md`, `.pdf`, `.py`, and `.js`
 
 ### Corpus and Document Management
 
-Partially implemented. Users can upload and view documents in the frontend sidebar. The database has `documents`, `chunks`, `corpus`, and `corpus_documents` tables. However, full corpus collection management, backend document listing, active-document filtering, and document deletion are future improvements.
+Partially implemented. Users can upload and view documents in the frontend sidebar, and saved documents reload through `GET /documents`. Sidebar checkboxes are sent to the backend so chat and artifact generation can filter retrieval by selected active documents. The database has `documents`, `chunks`, `corpus`, and `corpus_documents` tables. However, full named corpus collection management and document deletion are future improvements.
 
 ### Retrieval-Grounded Chat
 
 Implemented. The chat route loads saved chunks, retrieves relevant chunks using keyword matching, and sends them to Gemini for a grounded answer.
 
+### Chat History
+
+Implemented for demo use. Conversations can be saved to SQLite through `/chats`, recent chat titles are displayed in the sidebar, and clicking a saved chat reloads its messages into the chat panel. The current implementation saves chat snapshots; a production version would update an ongoing conversation instead.
+
 ### Flashcards
 
-Implemented. The frontend and backend support flashcard generation from retrieved document context. Generated content is saved locally and metadata is inserted into the `artifacts` table.
+Implemented. The frontend and backend support flashcard generation from retrieved document context. Generated content is saved locally and metadata is inserted into the `artifacts` table. When Gemini returns valid JSON, flashcards are rendered as readable question/answer cards, with a raw text fallback if parsing fails.
 
 ### Quiz
 
-Implemented. The frontend and backend support quiz generation from retrieved document context. Generated content is saved locally and metadata is inserted into the `artifacts` table.
+Implemented. The frontend and backend support quiz generation from retrieved document context. Generated content is saved locally and metadata is inserted into the `artifacts` table. When Gemini returns valid JSON, quizzes are rendered as question cards with options, answer, and explanation, with a raw text fallback if parsing fails.
 
 ### Source-Code Analysis Reports
 
-Implemented. The platform supports source-code analysis through `POST /artifacts/code-analysis`. It asks Gemini to produce code review comments, possible bugs, architecture overview, control-flow explanation, and improvement suggestions. This works best when uploaded `.py` or `.js` files are queried with function/class names that appear in the code.
+Implemented. The platform supports source-code analysis through `POST /artifacts/code-analysis`. It asks Gemini to produce code review comments, possible bugs, architecture overview, control-flow explanation, and improvement suggestions. The frontend formats the plain text report into readable report sections. This works best when uploaded `.py` or `.js` files are queried with function/class names that appear in the code.
 
 ### Prompt Steering
 
@@ -95,7 +100,7 @@ Partially implemented. Backend chat, flashcards, and quiz prompts support option
 
 ### Persistence
 
-Implemented. Uploaded documents and chunks persist in SQLite. Generated artifacts are saved in `backend/generated_artifacts/`, and their metadata is stored in the `artifacts` table.
+Implemented. Uploaded documents and chunks persist in SQLite and reload into the frontend document sidebar. Generated artifacts are saved in `backend/generated_artifacts/`, and their metadata is stored in the `artifacts` table. Chat conversations can also be saved in `chats` and `chat_messages`.
 
 ### Cost Observability
 
@@ -120,19 +125,33 @@ Main tables:
 - `corpus`: planned grouping table for document collections.
 - `corpus_documents`: join table for documents and corpora.
 - `artifacts`: generated flashcards, quizzes, and code-analysis report metadata.
+- `chats`: saved chat conversation titles.
+- `chat_messages`: saved chat messages linked to chats.
 - `user`: planned user account data.
 - `session`: planned session data.
 - `cost`: estimated usage records for AI-related requests.
 
-The current implementation actively uses `documents`, `chunks`, `artifacts`, and `cost`.
+The current implementation actively uses `documents`, `chunks`, `artifacts`, `chats`, `chat_messages`, and `cost`.
 
 ## 8. Main API Endpoints
 
 - `POST /documents`
   - Upload and ingest a document.
 
+- `GET /documents`
+  - List saved documents for the frontend sidebar.
+
 - `POST /chat`
   - Ask a grounded question using retrieved document chunks.
+
+- `POST /chats`
+  - Save a chat title and message list.
+
+- `GET /chats`
+  - List saved chat conversations.
+
+- `GET /chats/<chat_id>`
+  - Return saved messages for one chat.
 
 - `POST /artifacts/flashcards`
   - Generate flashcards from retrieved context.
@@ -167,13 +186,14 @@ What worked:
 - Smaller prompts and fewer retrieved chunks reduced quota pressure.
 - Explicit no-context behavior made answers more honest.
 - Structured artifact prompts made flashcards and quizzes easier to display and save.
+- Parsing valid artifact JSON on the frontend improved the demo experience for flashcards and quizzes.
 
 What failed or needed redesign:
 
 - Early frontend behavior was mock-only and did not call the real backend.
 - Retrieval initially risked sending unrelated chunks.
 - Gemini free quota caused `429 TooManyRequests` during testing.
-- Artifact output sometimes appears as raw JSON/plain text and needs more UI formatting.
+- Artifact output needed UI formatting. Flashcards and quizzes now render as cards when valid JSON is returned, and code-analysis reports are formatted into readable text sections.
 
 ## 10. AI Collaboration
 
@@ -190,7 +210,10 @@ AI output was not accepted blindly. We reviewed generated suggestions against th
   - Free quota caused rate-limit errors. We switched to a lighter default model, reduced retrieved chunks, limited context length, and added clear quota error responses.
 
 - Raw JSON display for artifacts
-  - Flashcards and quizzes may display raw structured text. This is acceptable for a demo but needs UI polish.
+  - Flashcards and quizzes initially displayed raw structured text. The frontend now parses valid JSON into cards, while still falling back to raw text when parsing fails.
+
+- Chat history restore
+  - Chat history persistence was added late in the project. Recent chat titles are listed and can reload saved messages into the chat panel, but a production version would update existing conversations instead of saving many separate snapshots.
 
 - Merge conflicts in journal/prompt history
   - Conflict markers appeared during collaboration and had to be cleaned while preserving valid logs.
@@ -199,17 +222,21 @@ AI output was not accepted blindly. We reviewed generated suggestions against th
   - A real key appeared in logs during development. The key was redacted from `JOURNAL.md` and `prompts_history.md`, and the team should revoke/rotate any exposed key.
 
 - Retrieval initially broad/all chunks
-  - The system currently retrieves from all saved chunks. Visual active-document selection exists, but backend filtering by selected documents is future work.
+  - The system originally retrieved from all saved chunks. It now sends selected document IDs from the frontend and filters retrieval by those active documents when IDs are provided.
 
 ## 12. Division of Work
 
-Chloé - Frontend/UI:
+Chloe - Frontend/UI:
 
 - React interface.
 - Sidebar and navigation.
 - Chat page.
+- Recent chat sidebar UI.
 - Upload UI.
 - Flashcards, quiz, and code-analysis pages.
+- Flashcard and quiz card display polish.
+- Code-analysis report formatting.
+- Active document selection wiring for backend retrieval.
 - Visual layout and user flow.
 
 Stanislaw - Backend/database/architecture:
@@ -218,6 +245,8 @@ Stanislaw - Backend/database/architecture:
 - Route organization.
 - SQLite schema and persistence.
 - Document, chunk, artifact, and cost tables.
+- Chat history tables and route wiring.
+- Document list endpoint.
 - Backend wiring and architecture/database documentation.
 
 Victor - AI/RAG/retrieval/Gemini/features integration:
@@ -242,6 +271,8 @@ Manual testing covered:
 - React/Vite frontend startup.
 - Document upload and chunk creation.
 - Chat with retrieved chunks.
+- Saved chat history endpoint and sidebar list.
+- Active document filtering for retrieval.
 - Flashcard generation.
 - Quiz generation.
 - Code-analysis report generation.
@@ -263,12 +294,11 @@ Detailed test notes are in `documentation/manual_test_results.md`.
 ## 15. Future Improvements
 
 - Add vector search and embeddings.
-- Filter retrieval by selected active documents.
 - Add document deletion.
 - Build full corpus collection management.
 - Add production authentication.
 - Use exact Gemini token metadata if available.
-- Improve rendering for flashcards, quizzes, and code-analysis reports.
+- Update saved chats instead of creating a new saved snapshot after each response.
 - Add automated backend and frontend tests.
 - Add document list and artifact list endpoints.
 - Add downloadable/exportable generated artifacts.
