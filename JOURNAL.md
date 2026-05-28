@@ -1583,3 +1583,19 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 28-05-2026 06:25
 - **Prompt**: so where can i run it?
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 28-05-2026 06:26
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: so where can i run it?
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: No code changes; clarifying the exact folder/command to run the Flask backend and frontend.
+- **Context and Reasons for Changes**: The user asked where to run the app now that the backend port was changed to avoid a local port conflict.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 28-05-2026 06:28
+- **Prompt**: still Failed to fetch
