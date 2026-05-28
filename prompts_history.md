@@ -350,3 +350,6 @@
 ### 28-05-2026 07:10
 - **Prompt**: replace the logo for this website to
 
+### 28-05-2026 07:15
+- **Prompt**: replace the logo by westie.png file in src
+

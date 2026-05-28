@@ -3,6 +3,16 @@
 ### **New Interaction**
 
 - **Agent Version**: 2.3
+- **Date**: 28-05-2026 07:11
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: replace the logo for this website to
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Replaced the existing geometric brand mark with a cat-style logo component and reused it in both the sidebar and login header.
+- **Context and Reasons for Changes**: The user provided a new logo image and wanted the website branding updated to match it.
+
+- **Agent Version**: 2.3
 - **Date**: 28-05-2026 07:09
 - **User**: thuong-gia-han.pham@epita.fr
 - **Prompt**: delete the button under the chatbox: Flashcards Quiz Code Analysis Summarise Q&A
@@ -1661,3 +1671,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 28-05-2026 07:10
 - **Prompt**: replace the logo for this website to
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 28-05-2026 07:15
+- **Prompt**: replace the logo by westie.png file in src
