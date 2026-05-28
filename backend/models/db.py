@@ -1,4 +1,8 @@
+from pathlib import Path
 import sqlite3
+
+
 def get_connection():
-    conn  = sqlite3.connect('database/corpus-forge.db')
+    db_path = Path(__file__).resolve().parents[1] / "database" / "corpus-forge.db"
+    conn = sqlite3.connect(db_path)
     return conn

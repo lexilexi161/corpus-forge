@@ -46,14 +46,6 @@ type CostApiResponse = {
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────
-const QUICK_ACTIONS = [
-  { label: "Flashcards", icon: "🃏" },
-  { label: "Quiz", icon: "📝" },
-  { label: "Code Analysis", icon: "💻" },
-  { label: "Summarise", icon: "✦" },
-  { label: "Q&A", icon: "💬" },
-];
-
 const NAV: { label: NavItem; icon: React.ReactNode }[] = [
   {
     label: "Chat",
@@ -63,9 +55,9 @@ const NAV: { label: NavItem; icon: React.ReactNode }[] = [
       </svg>
     ),
   },
-  { label: "Flashcards", icon: <span className="nav-emoji">🃏</span> },
-  { label: "Quiz", icon: <span className="nav-emoji">📝</span> },
-  { label: "Code Analysis", icon: <span className="nav-emoji">💻</span> },
+  { label: "Flashcards", icon: null },
+  { label: "Quiz", icon: null },
+  { label: "Code Analysis", icon: null },
   {
     label: "Cost",
     icon: (
@@ -239,13 +231,6 @@ function LoginPage({ onLogin }: { onLogin: (user: StoredUser) => void }) {
 
       <div className="login-page-inner">
         <div className="login-page-brand">
-          <div className="login-page-logo">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-          </div>
           <span className="login-page-brand-name">CorpusForge</span>
         </div>
 
@@ -483,18 +468,6 @@ function ChatPage({
                 </div>
               </div>
             </div>
-
-
-
-            <div className="hero-quick-row">
-              {QUICK_ACTIONS.map((a) => (
-                <button key={a.label} type="button" className="hero-quick-btn" onClick={() => onNavigate && onNavigate(a.label as NavItem)}>
-                  <span className="hero-quick-icon">{a.icon}</span>
-                  {a.label}
-                </button>
-              ))}
-            </div>
-
             {!isLoggedIn && (
               <p className="hero-login-hint">
                 <button type="button" className="hero-login-link" onClick={onRequireLogin}>
@@ -553,12 +526,10 @@ function ChatPage({
 // ── Artifact Generator Page ───────────────────────────────────────────────
 function ArtifactGeneratorPage({
   label,
-  icon,
   defaultCount,
   onGenerate,
 }: {
   label: string;
-  icon: string;
   defaultCount: number;
   onGenerate: (topic: string, count?: number) => Promise<unknown>;
 }) {
@@ -604,7 +575,6 @@ function ArtifactGeneratorPage({
 
   return (
     <div className="placeholder-page">
-      <span className="placeholder-icon">{icon}</span>
       <h2 className="placeholder-title">{label}</h2>
       <p className="placeholder-sub">Generate {label.toLowerCase()} from your uploaded document context.</p>
 
@@ -675,10 +645,8 @@ function ArtifactGeneratorPage({
 
 // ── Code Analysis Page ────────────────────────────────────────────────────
 function CodeAnalysisPage({
-  icon,
   onGenerate,
 }: {
-  icon: string;
   onGenerate: (topic: string) => Promise<unknown>;
 }) {
   const [topic, setTopic] = useState("");
@@ -719,7 +687,6 @@ function CodeAnalysisPage({
 
   return (
     <div className="placeholder-page">
-      <span className="placeholder-icon">{icon}</span>
       <h2 className="placeholder-title">Code Analysis</h2>
       <p className="placeholder-sub">Generate a code review report from your uploaded source files.</p>
 
@@ -1056,7 +1023,6 @@ export default function App() {
         return (
           <ArtifactGeneratorPage
             label="Flashcards"
-            icon="🃏"
             defaultCount={10}
             onGenerate={(topic, count) => generateFlashcards(topic, { count })}
           />
@@ -1065,13 +1031,12 @@ export default function App() {
         return (
           <ArtifactGeneratorPage
             label="Quiz"
-            icon="📝"
             defaultCount={5}
             onGenerate={(topic, count) => generateQuiz(topic, { count })}
           />
         );
       case "Code Analysis":
-        return <CodeAnalysisPage icon="💻" onGenerate={(topic) => generateCodeAnalysis(topic)} />;
+        return <CodeAnalysisPage onGenerate={(topic) => generateCodeAnalysis(topic)} />;
       case "Cost":
         return <CostPage />;
       case "Profile":
@@ -1105,13 +1070,6 @@ export default function App() {
         <aside className="sidebar">
           <div className="sidebar-header">
             <div className="sidebar-logo">
-              <div className="logo-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                  <path d="M2 17l10 5 10-5" />
-                  <path d="M2 12l10 5 10-5" />
-                </svg>
-              </div>
               <span className="logo-text">CorpusForge</span>
             </div>
             <button type="button" className="new-chat-btn" onClick={() => { setActiveNav("Chat"); setChatKey(k => k + 1); }}>
@@ -1164,7 +1122,7 @@ export default function App() {
                 className={`nav-item ${activeNav === label ? "active" : ""}`}
                 onClick={() => setActiveNav(label)}
               >
-                <span className="nav-icon-wrap">{icon}</span>
+                {icon ? <span className="nav-icon-wrap">{icon}</span> : null}
                 {label}
               </button>
             ))}
@@ -1240,9 +1198,9 @@ const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --accent:        #3756AB;
-    --accent-soft:   #E8EDF8;
-    --accent-hover:  #2C4490;
+    --accent:        #000000;
+    --accent-soft:   #E9E9E9;
+    --accent-hover:  #1A1A1A;
     --bg:            #FFFFFF;
     --panel:         #FFFFFF;
     --card:          #FFFFFF;
@@ -1288,21 +1246,14 @@ const CSS = `
   }
 
   .logo-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    display: none;
   }
 
   .logo-text {
     font-family: 'Lora', Georgia, serif;
     font-weight: 600;
-    font-size: 15px;
-    letter-spacing: -0.2px;
+    font-size: 18px;
+    letter-spacing: -0.3px;
   }
 
   .new-chat-btn {
@@ -1733,41 +1684,6 @@ const CSS = `
   .hero-send:disabled { opacity: 0.35; cursor: default; }
   .hero-send:not(:disabled):hover { background: var(--accent-hover); }
 
-  .hero-quick-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 20px;
-    max-width: 640px;
-  }
-
-  .hero-quick-row.compact { margin-top: 0; margin-bottom: 10px; justify-content: flex-start; max-width: none; }
-
-  .hero-quick-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--text);
-    font-size: 13px;
-    font-family: inherit;
-    cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    transition: all 0.15s;
-  }
-
-  .hero-quick-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-soft);
-  }
-
-  .hero-quick-icon { font-size: 15px; line-height: 1; }
-
   .hero-login-hint {
     margin-top: 20px;
     font-size: 13px;
@@ -1862,6 +1778,7 @@ const CSS = `
   }
 
   .chat-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(55, 86, 171, 0.12); }
+  .chat-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12); }
 
   /* ── Placeholder & pages ── */
   .placeholder-page,
@@ -1881,7 +1798,6 @@ const CSS = `
     gap: 12px;
   }
 
-  .placeholder-icon { font-size: 48px; }
   .placeholder-title {
     font-family: 'Lora', Georgia, serif;
     font-size: 24px;
@@ -2069,20 +1985,13 @@ const CSS = `
   }
 
   .login-page-logo {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: #1C1A17;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none;
   }
 
   .login-page-brand-name {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 600;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.4px;
     color: #1C1A17;
   }
 
