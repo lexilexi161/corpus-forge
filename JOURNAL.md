@@ -3,6 +3,16 @@
 ### **New Interaction**
 
 - **Agent Version**: 2.3
+- **Date**: 28-05-2026 07:16
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: tăng size của logo và chữ CorpusForge
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Increased the sidebar and login logo sizes, and enlarged the CorpusForge wordmark text in both places.
+- **Context and Reasons for Changes**: The user wanted the branding to be more prominent and easier to read.
+
+- **Agent Version**: 2.3
 - **Date**: 28-05-2026 07:15
 - **User**: thuong-gia-han.pham@epita.fr
 - **Prompt**: replace the logo by westie.png file in src
@@ -1691,3 +1701,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 28-05-2026 07:16
 - **Prompt**: tăng size của logo và chữ  CorpusForge
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 28-05-2026 07:17
+- **Prompt**: delete the logo

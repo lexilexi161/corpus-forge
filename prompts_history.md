@@ -356,3 +356,6 @@
 ### 28-05-2026 07:16
 - **Prompt**: tăng size của logo và chữ  CorpusForge
 
+### 28-05-2026 07:17
+- **Prompt**: delete the logo
+
