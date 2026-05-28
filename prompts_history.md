@@ -344,3 +344,6 @@
 ### 28-05-2026 07:06
 - **Prompt**: remove these icon
 
+### 28-05-2026 07:08
+- **Prompt**: delete the button under the chatbox: Flashcards Quiz Code Analysis Summarise Q&A
+
