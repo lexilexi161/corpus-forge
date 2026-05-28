@@ -3,6 +3,16 @@
 ### **New Interaction**
 
 - **Agent Version**: 2.3
+- **Date**: 28-05-2026 07:09
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: delete the button under the chatbox: Flashcards Quiz Code Analysis Summarise Q&A
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Removed the five quick-action buttons beneath the chat box and deleted the now-unused quick-action list and related styles from the frontend.
+- **Context and Reasons for Changes**: The user wanted the button row under the chat input removed entirely for a cleaner chat layout.
+
+- **Agent Version**: 2.3
 - **Date**: 28-05-2026 07:07
 - **User**: thuong-gia-han.pham@epita.fr
 - **Prompt**: remove these icon
@@ -1646,3 +1656,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 28-05-2026 07:08
 - **Prompt**: delete the button under the chatbox: Flashcards Quiz Code Analysis Summarise Q&A
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 28-05-2026 07:10
+- **Prompt**: replace the logo for this website to

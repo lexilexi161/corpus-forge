@@ -347,3 +347,6 @@
 ### 28-05-2026 07:08
 - **Prompt**: delete the button under the chatbox: Flashcards Quiz Code Analysis Summarise Q&A
 
+### 28-05-2026 07:10
+- **Prompt**: replace the logo for this website to
+
