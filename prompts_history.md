@@ -338,3 +338,6 @@
 ### 28-05-2026 06:28
 - **Prompt**: still Failed to fetch
 
+### 28-05-2026 07:02
+- **Prompt**: change the main color and button to black color. delete the icon of flash card, quiz, code
+

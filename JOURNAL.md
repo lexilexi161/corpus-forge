@@ -1599,3 +1599,20 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 28-05-2026 06:28
 - **Prompt**: still Failed to fetch
+
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 28-05-2026 06:30
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: still Failed to fetch
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Fixed the SQLite connection path to resolve from `backend/models/db.py`, so Flask can open `backend/database/corpus-forge.db` regardless of the working directory.
+- **Context and Reasons for Changes**: The backend was returning 500s because the database path was relative to the launch folder instead of the backend package, which broke chat requests and surfaced as a fetch failure in the browser.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 28-05-2026 07:02
+- **Prompt**: change the main color and button to black color. delete the icon of flash card, quiz, code
