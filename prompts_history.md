@@ -353,3 +353,6 @@
 ### 28-05-2026 07:15
 - **Prompt**: replace the logo by westie.png file in src
 
+### 28-05-2026 07:16
+- **Prompt**: tăng size của logo và chữ  CorpusForge
+

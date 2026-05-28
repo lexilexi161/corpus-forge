@@ -3,6 +3,16 @@
 ### **New Interaction**
 
 - **Agent Version**: 2.3
+- **Date**: 28-05-2026 07:15
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: replace the logo by westie.png file in src
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Replaced the custom logo component with the `frontend/src/Westie.png` asset and updated the sidebar and login brand to render the image directly.
+- **Context and Reasons for Changes**: The user wanted the website branding to use the provided Westie image from the source folder instead of the previous vector mark.
+
+- **Agent Version**: 2.3
 - **Date**: 28-05-2026 07:11
 - **User**: thuong-gia-han.pham@epita.fr
 - **Prompt**: replace the logo for this website to
@@ -1676,3 +1686,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 28-05-2026 07:15
 - **Prompt**: replace the logo by westie.png file in src
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 28-05-2026 07:16
+- **Prompt**: tăng size của logo và chữ  CorpusForge
