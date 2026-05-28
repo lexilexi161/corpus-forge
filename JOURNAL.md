@@ -3,6 +3,16 @@
 ### **New Interaction**
 
 - **Agent Version**: 2.3
+- **Date**: 28-05-2026 07:18
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: delete the logo
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Removed the Westie image from the sidebar and login branding, leaving the CorpusForge text only.
+- **Context and Reasons for Changes**: The user wanted the logo deleted from the website branding.
+
+- **Agent Version**: 2.3
 - **Date**: 28-05-2026 07:16
 - **User**: thuong-gia-han.pham@epita.fr
 - **Prompt**: tăng size của logo và chữ CorpusForge
@@ -1706,3 +1716,8 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 28-05-2026 07:17
 - **Prompt**: delete the logo
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 28-05-2026 07:21
+- **Prompt**: help me to push it
