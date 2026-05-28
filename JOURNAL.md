@@ -1551,3 +1551,19 @@ Do not change the database schema.
 - **Hook Version**: 1.02
 - **Date**: 28-05-2026 06:21
 - **Prompt**: why when i chat its Failed to fetch
+### **New Interaction**
+
+- **Agent Version**: 2.3
+- **Date**: 28-05-2026 06:21
+- **User**: thuong-gia-han.pham@epita.fr
+- **Prompt**: why when i chat its Failed to fetch
+- **CoPilot Mode**: Ask
+- **CoPilot Model**: GPT-5.4 mini
+- **Socratic Mode**: ON
+- **Changes Made**: Checking whether the frontend is pointed at the correct backend port and whether the target port is actually listening.
+- **Context and Reasons for Changes**: A browser fetch error usually means the browser cannot reach the API host/port, so I verified the local listeners first.
+
+### **New Interaction**
+- **Hook Version**: 1.02
+- **Date**: 28-05-2026 06:23
+- **Prompt**: yes
