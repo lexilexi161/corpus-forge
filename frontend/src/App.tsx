@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-import {
-  generateFlashcards,
-  generateCodeAnalysis,
-  generateQuiz,
+            </div >
   getCost,
   getDocuments,
   sendChatMessage,
@@ -11,10 +7,8 @@ import {
   saveChat,
   getChats,
   getChatById,
-} from "./api";
-
-// ── Types ──────────────────────────────────────────────────────────────────
-type NavItem = "Chat" | "Flashcards" | "Quiz" | "Code Analysis" | "Cost" | "Profile";
+  deleteChat,
+  type NavItem = "Chat" | "Flashcards" | "Quiz" | "Code Analysis" | "Cost" | "Profile";
 type Doc = {
   id: string;
   documentId?: number;
@@ -55,7 +49,6 @@ const QUICK_ACTIONS: QuickAction[] = [
   { label: "Cost", icon: "✦", target: "Cost" },
   { label: "Q&A", icon: "💬", target: "Chat" },
 ];
-
 const NAV: { label: NavItem; icon: React.ReactNode }[] = [
   {
     label: "Chat",
@@ -65,9 +58,9 @@ const NAV: { label: NavItem; icon: React.ReactNode }[] = [
       </svg>
     ),
   },
-  { label: "Flashcards", icon: <span className="nav-emoji">🃏</span> },
-  { label: "Quiz", icon: <span className="nav-emoji">📝</span> },
-  { label: "Code Analysis", icon: <span className="nav-emoji">💻</span> },
+  { label: "Flashcards", icon: null },
+  { label: "Quiz", icon: null },
+  { label: "Code Analysis", icon: null },
   {
     label: "Cost",
     icon: (
@@ -241,13 +234,6 @@ function LoginPage({ onLogin }: { onLogin: (user: StoredUser) => void }) {
 
       <div className="login-page-inner">
         <div className="login-page-brand">
-          <div className="login-page-logo">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-          </div>
           <span className="login-page-brand-name">CorpusForge</span>
         </div>
 
@@ -493,9 +479,6 @@ function ChatPage({
                 </div>
               </div>
             </div>
-
-
-
             <div className="hero-quick-row">
               {QUICK_ACTIONS.map((a) => (
                 <button key={a.label} type="button" className="hero-quick-btn" onClick={() => onNavigate && onNavigate(a.target)}>
@@ -512,8 +495,9 @@ function ChatPage({
                 </button>{" "}
                 to use your name and save your work.
               </p>
-            )}
-          </div>
+            )
+            }
+          </div >
         ) : (
           <div className="chat-messages">
             {messages.map((msg, i) => (
@@ -533,8 +517,9 @@ function ChatPage({
             ))}
             <div ref={bottomRef} />
           </div>
-        )}
-      </div>
+        )
+        }
+      </div >
 
       {hasMessages && (
         <div className="chat-input-bar">
@@ -556,7 +541,7 @@ function ChatPage({
           </div>
         </div>
       )}
-    </div>
+    </div >
   );
 }
 
@@ -614,13 +599,11 @@ function renderReportContent(content: string) {
 
 function ArtifactGeneratorPage({
   label,
-  icon,
   defaultCount,
   onGenerate,
   documentIds,
 }: {
   label: string;
-  icon: string;
   defaultCount: number;
   onGenerate: (topic: string, count?: number, documentIds?: number[]) => Promise<unknown>;
   documentIds: number[];
@@ -667,7 +650,6 @@ function ArtifactGeneratorPage({
 
   return (
     <div className="placeholder-page">
-      <span className="placeholder-icon">{icon}</span>
       <h2 className="placeholder-title">{label}</h2>
       <p className="placeholder-sub">Generate {label.toLowerCase()} from your uploaded document context.</p>
 
@@ -715,7 +697,7 @@ function ArtifactGeneratorPage({
               <div className="artifact-cards">
                 {parsed.questions.map((q: { question: string; options: string[]; correct_answer: string; explanation: string }, i: number) => (
                   <div key={i} className="quiz-card">
-                    <p className="flashcard-q"><strong>Q{i+1}:</strong> {q.question}</p>
+                    <p className="flashcard-q"><strong>Q{i + 1}:</strong> {q.question}</p>
                     <ul className="quiz-options">
                       {q.options.map((opt: string, j: number) => (
                         <li key={j} className={opt === q.correct_answer ? "correct-option" : ""}>{opt}</li>
@@ -738,11 +720,9 @@ function ArtifactGeneratorPage({
 
 // ── Code Analysis Page ────────────────────────────────────────────────────
 function CodeAnalysisPage({
-  icon,
   onGenerate,
   documentIds,
 }: {
-  icon: string;
   onGenerate: (topic: string, documentIds?: number[]) => Promise<unknown>;
   documentIds: number[];
 }) {
@@ -784,7 +764,6 @@ function CodeAnalysisPage({
 
   return (
     <div className="placeholder-page">
-      <span className="placeholder-icon">{icon}</span>
       <h2 className="placeholder-title">Code Analysis</h2>
       <p className="placeholder-sub">Generate a code review report from your uploaded source files.</p>
 
@@ -990,7 +969,7 @@ export default function App() {
   const [selectedChatMessages, setSelectedChatMessages] = useState<Message[]>([]);
 
   const refreshChatHistory = () => {
-    getChats().then((chats) => setChatHistory(chats as ChatHistoryItem[])).catch(() => {});
+    getChats().then((chats) => setChatHistory(chats as ChatHistoryItem[])).catch(() => { });
   };
 
   React.useEffect(() => {
@@ -1019,7 +998,7 @@ export default function App() {
 
         setDocs(loadedDocs);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   React.useEffect(() => {
@@ -1147,7 +1126,7 @@ export default function App() {
             isLoggedIn={isLoggedIn}
             onRequireLogin={requireLogin}
             onSaveChat={(title, msgs) => {
-              saveChat(title, msgs).then(() => refreshChatHistory()).catch(() => {});
+              saveChat(title, msgs).then(() => refreshChatHistory()).catch(() => { });
             }}
             onNavigate={(page) => setActiveNav(page)}
             initialMessages={selectedChatMessages}
@@ -1157,7 +1136,6 @@ export default function App() {
         return (
           <ArtifactGeneratorPage
             label="Flashcards"
-            icon="🃏"
             defaultCount={10}
             onGenerate={(topic, count, documentIds) => generateFlashcards(topic, { count, document_ids: documentIds })}
             documentIds={activeDocumentIds}
@@ -1167,14 +1145,13 @@ export default function App() {
         return (
           <ArtifactGeneratorPage
             label="Quiz"
-            icon="📝"
             defaultCount={5}
             onGenerate={(topic, count, documentIds) => generateQuiz(topic, { count, document_ids: documentIds })}
             documentIds={activeDocumentIds}
           />
         );
       case "Code Analysis":
-        return <CodeAnalysisPage icon="💻" onGenerate={(topic, documentIds) => generateCodeAnalysis(topic, { document_ids: documentIds })} documentIds={activeDocumentIds} />;
+        return <CodeAnalysisPage onGenerate={(topic, documentIds) => generateCodeAnalysis(topic, { document_ids: documentIds })} documentIds={activeDocumentIds} />;
       case "Cost":
         return <CostPage />;
       case "Profile":
@@ -1208,13 +1185,6 @@ export default function App() {
         <aside className="sidebar">
           <div className="sidebar-header">
             <div className="sidebar-logo">
-              <div className="logo-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                  <path d="M2 17l10 5 10-5" />
-                  <path d="M2 12l10 5 10-5" />
-                </svg>
-              </div>
               <span className="logo-text">CorpusForge</span>
             </div>
             <button type="button" className="new-chat-btn" onClick={() => { setSelectedChatMessages([]); setActiveNav("Chat"); setChatKey(k => k + 1); }}>
@@ -1230,22 +1200,31 @@ export default function App() {
             <div className="sidebar-history">
               <p className="sidebar-section-label">Recent chats</p>
               {chatHistory.slice(0, 5).map((chat) => (
-                <button
-                  key={chat.chat_id}
-                  type="button"
-                  className="history-item"
-                  onClick={() => {
-                    getChatById(chat.chat_id)
-                      .then((messages) => {
-                        setSelectedChatMessages(messages as Message[]);
+                <div key={chat.chat_id} className="history-item-row">
+                  <button
+                    type="button"
+                    className="history-item"
+                    onClick={() => {
+                      getChatById(chat.chat_id).then((msgs: any[]) => {
+                        setInitialMessages(msgs.map((m: any) => ({ role: m.role as "user" | "ai", content: m.content })));
+                        setChatKey(k => k + 1);
                         setActiveNav("Chat");
-                        setChatKey((key) => key + 1);
-                      })
-                      .catch(() => {});
-                  }}
-                >
-                  {chat.title}
-                </button>
+                      }).catch(() => { });
+                    }}
+                  >
+                    {chat.title}
+                  </button>
+                  <button
+                    type="button"
+                    className="history-delete-btn"
+                    onClick={() => {
+                      deleteChat(chat.chat_id).then(() => refreshChatHistory()).catch(() => { });
+                    }}
+                    title="Delete chat"
+                  >
+                    ×
+                  </button>
+                </div>
               ))}
             </div>
           )}
@@ -1258,7 +1237,7 @@ export default function App() {
                 className={`nav-item ${activeNav === label ? "active" : ""}`}
                 onClick={() => setActiveNav(label)}
               >
-                <span className="nav-icon-wrap">{icon}</span>
+                {icon ? <span className="nav-icon-wrap">{icon}</span> : null}
                 {label}
               </button>
             ))}
@@ -1334,9 +1313,9 @@ const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --accent:        #3756AB;
-    --accent-soft:   #E8EDF8;
-    --accent-hover:  #2C4490;
+    --accent:        #000000;
+    --accent-soft:   #E9E9E9;
+    --accent-hover:  #1A1A1A;
     --bg:            #FFFFFF;
     --panel:         #FFFFFF;
     --card:          #FFFFFF;
@@ -1382,21 +1361,14 @@ const CSS = `
   }
 
   .logo-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    display: none;
   }
 
   .logo-text {
     font-family: 'Lora', Georgia, serif;
     font-weight: 600;
-    font-size: 15px;
-    letter-spacing: -0.2px;
+    font-size: 18px;
+    letter-spacing: -0.3px;
   }
 
   .new-chat-btn {
@@ -1868,41 +1840,6 @@ const CSS = `
   .hero-send:disabled { opacity: 0.35; cursor: default; }
   .hero-send:not(:disabled):hover { background: var(--accent-hover); }
 
-  .hero-quick-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 20px;
-    max-width: 640px;
-  }
-
-  .hero-quick-row.compact { margin-top: 0; margin-bottom: 10px; justify-content: flex-start; max-width: none; }
-
-  .hero-quick-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--text);
-    font-size: 13px;
-    font-family: inherit;
-    cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    transition: all 0.15s;
-  }
-
-  .hero-quick-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-soft);
-  }
-
-  .hero-quick-icon { font-size: 15px; line-height: 1; }
-
   .hero-login-hint {
     margin-top: 20px;
     font-size: 13px;
@@ -1997,6 +1934,7 @@ const CSS = `
   }
 
   .chat-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(55, 86, 171, 0.12); }
+  .chat-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12); }
 
   /* ── Placeholder & pages ── */
   .placeholder-page,
@@ -2016,7 +1954,6 @@ const CSS = `
     gap: 12px;
   }
 
-  .placeholder-icon { font-size: 48px; }
   .placeholder-title {
     font-family: 'Lora', Georgia, serif;
     font-size: 24px;
@@ -2204,20 +2141,13 @@ const CSS = `
   }
 
   .login-page-logo {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: #1C1A17;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none;
   }
 
   .login-page-brand-name {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 600;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.4px;
     color: #1C1A17;
   }
 
@@ -2448,6 +2378,16 @@ const CSS = `
     text-overflow: ellipsis; transition: background 0.15s, color 0.15s;
   }
   .history-item:hover { background: var(--surface-subtle); color: var(--text); }
+  .history-item-row { display: flex; align-items: center; gap: 4px; }
+  .history-item-row .history-item { flex: 1; }
+  .history-delete-btn {
+    flex-shrink: 0; width: 18px; height: 18px; border-radius: 4px; border: none;
+    background: none; color: var(--text-muted); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; opacity: 0;
+    transition: opacity 0.15s, background 0.15s;
+  }
+  .history-item-row:hover .history-delete-btn { opacity: 1; }
+  .history-delete-btn:hover { background: #fee2e2; color: #b91c1c; }
 
   .artifact-cards { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; width: 100%; max-width: 640px; }
   .flashcard {

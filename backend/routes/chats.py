@@ -111,3 +111,12 @@ def get_chat(chat_id):
         conn.close()
 
     return jsonify([{"role": r[0], "content": r[1]} for r in rows])
+@chats_bp.route("/chats/<int:chat_id>", methods=["DELETE"])
+def delete_chat(chat_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM chat_messages WHERE chat_id = ?", (chat_id,))
+    cursor.execute("DELETE FROM chats WHERE chat_id = ?", (chat_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "ok"})
