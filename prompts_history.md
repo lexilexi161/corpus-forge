@@ -341,3 +341,6 @@
 ### 28-05-2026 07:02
 - **Prompt**: change the main color and button to black color. delete the icon of flash card, quiz, code
 
+### 28-05-2026 07:06
+- **Prompt**: remove these icon
+
